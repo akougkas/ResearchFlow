@@ -29,12 +29,58 @@
     </header>
     
     <main class="app-main">
-      <div class="task-form-container"></div>
-      <div class="task-list-container"></div>
+      <!-- LEFT SIDEBAR: Form + Projects -->
+      <aside class="app-sidebar">
+        <!-- Task Form -->
+        <div class="task-form-container"></div>
+        
+        <!-- Project Manager -->
+        <div class="project-manager">
+          <h3>📁 Projects</h3>
+          <button class="new-project-btn">+ New Project</button>
+          <div class="project-list"></div>
+        </div>
+      </aside>
+
+      <!-- CENTER/RIGHT: Views + Controls -->
+      <section class="app-content">
+        <!-- Controls Bar -->
+        <div class="controls-bar">
+          <!-- View Switcher -->
+          <div class="view-controls">
+            <button class="view-btn" data-view="list" title="Ctrl+1">
+              📋 List
+            </button>
+            <button class="view-btn" data-view="kanban" title="Ctrl+2">
+              📊 Kanban
+            </button>
+            <button class="view-btn" data-view="timeline" title="Ctrl+3">
+              📅 Timeline
+            </button>
+          </div>
+
+          <!-- Template Switcher -->
+          <div class="template-switcher-container">
+            <button class="template-switcher">⚡ Load Template</button>
+          </div>
+
+          <!-- Save Indicator -->
+          <div class="save-indicator">💾 Saved</div>
+        </div>
+
+        <!-- Filter Panel (collapsed by default, visible on scroll) -->
+        <div class="filter-panel"></div>
+
+        <!-- Main Task List/View Area -->
+        <div class="task-list-container"></div>
+      </section>
     </main>
     
     <footer class="app-footer">
       <p>&copy; 2025 ResearchFlow. Designed for researchers, built for productivity.</p>
+      <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-top: 0.5rem;">
+        Shortcuts: <kbd>Ctrl+K</kbd> Quick add • <kbd>Ctrl+1/2/3</kbd> Switch views
+      </p>
     </footer>
   </div>
   

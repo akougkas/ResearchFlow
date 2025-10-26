@@ -47,9 +47,59 @@ class TaskStore {
   create(taskData) {
     const task = new Task(taskData);
     task.validate();
+    this.validateDependencies(task); // Check for circular dependencies
     this.tasks.push(task);
     this.save();
     return task;
+  }
+
+  /**
+   * Create multiple tasks from template with dependency resolution
+   * Maps template task indices to actual task IDs
+   */
+  createFromTemplate(generatedTasks) {
+    const createdTasks = [];
+    const indexToIdMap = {}; // Maps original index to created task ID
+
+    try {
+      // First pass: Create all tasks with empty dependencies
+      generatedTasks.forEach((taskData, index) => {
+        const task = new Task({
+          ...taskData,
+          dependencies: [] // Start with no dependencies
+        });
+        task.validate();
+        this.tasks.push(task);
+        indexToIdMap[index] = task.id;
+        createdTasks.push(task);
+      });
+
+      // Second pass: Resolve and update dependencies
+      generatedTasks.forEach((taskData, index) => {
+        const createdTask = createdTasks[index];
+        if (taskData.dependencies && Array.isArray(taskData.dependencies)) {
+          // Convert indices to actual task IDs
+          createdTask.dependencies = taskData.dependencies
+            .map(depIndex => indexToIdMap[depIndex])
+            .filter(id => id !== undefined);
+          
+          // Validate final dependencies
+          this.validateDependencies(createdTask);
+        }
+      });
+
+      this.save();
+      return createdTasks;
+    } catch (error) {
+      // Rollback: remove all created tasks if any validation fails
+      createdTasks.forEach(task => {
+        const idx = this.tasks.indexOf(task);
+        if (idx !== -1) {
+          this.tasks.splice(idx, 1);
+        }
+      });
+      throw error;
+    }
   }
 
   getAll() {
@@ -67,6 +117,12 @@ class TaskStore {
     Object.assign(task, updates);
     task.updatedAt = Date.now();
     task.validate();
+    
+    // If dependencies changed, validate them
+    if (updates.dependencies) {
+      this.validateDependencies(task);
+    }
+    
     this.save();
     return task;
   }
@@ -74,6 +130,13 @@ class TaskStore {
   delete(id) {
     const index = this.tasks.findIndex(t => t.id === id);
     if (index === -1) throw new Error('Task not found');
+    
+    // Remove this task from other tasks' dependencies
+    this.tasks.forEach(task => {
+      if (task.dependencies.includes(id)) {
+        task.dependencies = task.dependencies.filter(depId => depId !== id);
+      }
+    });
     
     const deleted = this.tasks.splice(index, 1)[0];
     this.save();
@@ -87,6 +150,99 @@ class TaskStore {
     task.toggleComplete();
     this.save();
     return task;
+  }
+
+  /**
+   * Check if a task can be completed (all dependencies are completed)
+   */
+  canComplete(taskId) {
+    const task = this.getById(taskId);
+    if (!task) return false;
+    
+    if (!task.dependencies || task.dependencies.length === 0) {
+      return true;
+    }
+
+    return task.dependencies.every(depId => {
+      const depTask = this.getById(depId);
+      return depTask && depTask.completed;
+    });
+  }
+
+  /**
+   * Get tasks that depend on a given task
+   */
+  getDependentTasks(taskId) {
+    return this.tasks.filter(task => 
+      task.dependencies && task.dependencies.includes(taskId)
+    );
+  }
+
+  /**
+   * Get all unblocked tasks (tasks with all dependencies completed or no dependencies)
+   */
+  getUnblockedTasks() {
+    return this.tasks.filter(task => this.canComplete(task.id));
+  }
+
+  /**
+   * Get all blocked tasks (tasks with incomplete dependencies)
+   */
+  getBlockedTasks() {
+    return this.tasks.filter(task => !this.canComplete(task.id) && !task.completed);
+  }
+
+  /**
+   * Validate dependencies for a task
+   * Checks for circular dependencies and invalid task references
+   */
+  validateDependencies(task) {
+    if (!task.dependencies || task.dependencies.length === 0) {
+      return true;
+    }
+
+    // Check for self-dependency
+    if (task.dependencies.includes(task.id)) {
+      throw new Error('Task cannot depend on itself');
+    }
+
+    // Check all dependencies exist
+    task.dependencies.forEach(depId => {
+      if (!this.getById(depId)) {
+        throw new Error(`Dependency not found: ${depId}`);
+      }
+    });
+
+    // Check for circular dependencies
+    const visited = new Set();
+    const recursionStack = new Set();
+
+    const hasCycle = (taskId) => {
+      visited.add(taskId);
+      recursionStack.add(taskId);
+
+      const currentTask = this.getById(taskId);
+      if (currentTask && currentTask.dependencies) {
+        for (const depId of currentTask.dependencies) {
+          if (!visited.has(depId)) {
+            if (hasCycle(depId)) {
+              return true;
+            }
+          } else if (recursionStack.has(depId)) {
+            return true; // Found a cycle
+          }
+        }
+      }
+
+      recursionStack.delete(taskId);
+      return false;
+    };
+
+    if (hasCycle(task.id)) {
+      throw new Error('Circular dependency detected. Task dependencies form a cycle.');
+    }
+
+    return true;
   }
 
   // Filtering methods
@@ -150,12 +306,14 @@ class TaskStore {
     const overdue = this.tasks.filter(t => 
       t.dueDate && new Date(t.dueDate) < new Date() && !t.completed
     ).length;
+    const blocked = this.getBlockedTasks().length;
 
     return {
       total,
       completed,
       pending: total - completed,
       overdue,
+      blocked,
       completionRate: total > 0 ? (completed / total * 100).toFixed(1) : 0
     };
   }

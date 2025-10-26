@@ -5,6 +5,7 @@ export class Task {
     category = 'data',
     priority = 'normal',
     completed = false,
+    status = undefined, // 'in-progress' or 'review' for Kanban board
     dueDate = null,
     createdAt = Date.now(),
     updatedAt = Date.now(),
@@ -18,6 +19,7 @@ export class Task {
     this.category = category;
     this.priority = priority;
     this.completed = completed;
+    this.status = status;
     this.dueDate = dueDate;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;

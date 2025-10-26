@@ -1996,10 +1996,10 @@ body {
 #### Task 2.1.1: Create Template Engine
 **File**: `src/features/templates/template-engine.js`
 
-- [ ] Define Template class
-- [ ] Implement template loading
-- [ ] Add task generation from template
-- [ ] Include date calculation for deadlines
+- [x] Define Template class
+- [x] Implement template loading
+- [x] Add task generation from template
+- [x] Include date calculation for deadlines
 
 **Acceptance Criteria**:
 - Templates can be loaded and applied
@@ -2011,42 +2011,42 @@ body {
 #### Task 2.1.2: Paper Submission Template
 **File**: `src/features/templates/paper-submission.js`
 
-- [ ] Define paper submission workflow
-- [ ] Include typical tasks (draft, review, format, submit)
-- [ ] Set relative deadlines from submission date
-- [ ] Add task dependencies
+- [x] Define paper submission workflow
+- [x] Include typical tasks (draft, review, format, submit)
+- [x] Set relative deadlines from submission date
+- [x] Add task dependencies
 
 ---
 
 #### Task 2.1.3: Grant Proposal Template
 **File**: `src/features/templates/grant-proposal.js`
 
-- [ ] Define grant workflow tasks
-- [ ] Include budget, aims, background sections
-- [ ] Add multi-month timeline
-- [ ] Include review cycles
+- [x] Define grant workflow tasks
+- [x] Include budget, aims, background sections
+- [x] Add multi-month timeline
+- [x] Include review cycles
 
 ---
 
 #### Task 2.1.4: Experiment Cycle Template
 **File**: `src/features/templates/experiment-cycle.js`
 
-- [ ] Define experiment workflow
-- [ ] Include preparation, execution, analysis phases
-- [ ] Add equipment/resource notes
-- [ ] Link related tasks
+- [x] Define experiment workflow
+- [x] Include preparation, execution, analysis phases
+- [x] Add equipment/resource notes
+- [x] Link related tasks
 
 ---
 
 ### 2.2 Task Dependencies
 
 #### Task 2.2.1: Implement Dependency System
-**File**: `src/features/dependencies.js`
+**File**: `src/core/taskStore.js` (integrated into taskStore)
 
-- [ ] Add dependency field to Task model
-- [ ] Create dependency validation (no circular deps)
-- [ ] Implement blocking logic (can't complete if deps not done)
-- [ ] Add visual dependency indicators
+- [x] Add dependency field to Task model
+- [x] Create dependency validation (no circular deps)
+- [x] Implement blocking logic (can't complete if deps not done)
+- [x] Add visual dependency indicators
 
 **Acceptance Criteria**:
 - Tasks can have multiple dependencies
@@ -2059,48 +2059,48 @@ body {
 ### 2.3 Enhanced Views
 
 #### Task 2.3.1: Kanban Board View
-**File**: `src/ui/views/kanban-view.js`
+**File**: `src/ui/components/KanbanView.js`
 
-- [ ] Create columns: TODO, IN PROGRESS, REVIEW, DONE
-- [ ] Implement drag-and-drop between columns
-- [ ] Update task status based on column
-- [ ] Add column task counts
+- [x] Create columns: TODO, IN PROGRESS, REVIEW, DONE
+- [x] Implement drag-and-drop between columns
+- [x] Update task status based on column
+- [x] Add column task counts
 
 ---
 
 #### Task 2.3.2: Timeline View
-**File**: `src/ui/views/timeline-view.js`
+**File**: `src/ui/components/TimelineView.js`
 
-- [ ] Create Gantt-style timeline
-- [ ] Show tasks on date axis
-- [ ] Highlight current date
-- [ ] Show dependencies as connections
+- [x] Create Gantt-style timeline
+- [x] Show tasks on date axis
+- [x] Highlight current date
+- [x] Show dependencies as connections (visual indicators in place)
 
 ---
 
 ### 2.4 Advanced Filtering
 
 #### Task 2.4.1: Multi-Filter System
-**File**: `src/ui/components/advanced-filter.js`
+**File**: `src/ui/components/AdvancedFilter.js`
 
-- [ ] Create filter panel
-- [ ] Add category checkboxes
-- [ ] Add priority checkboxes
-- [ ] Add date range picker
-- [ ] Add tag filter
-- [ ] Combine multiple filters
+- [x] Create filter panel
+- [x] Add category checkboxes
+- [x] Add priority checkboxes
+- [x] Add date range picker
+- [x] Add tag filter (search functionality)
+- [x] Combine multiple filters
 
 ---
 
 ### 2.5 Projects & Organization
 
 #### Task 2.5.1: Project Management
-**File**: `src/core/project-manager.js`
+**File**: `src/core/projectManager.js`
 
-- [ ] Implement project CRUD operations
-- [ ] Link tasks to projects
-- [ ] Add project color coding
-- [ ] Create project view/filter
+- [x] Implement project CRUD operations
+- [x] Link tasks to projects
+- [x] Add project color coding
+- [x] Create project view/filter (integrated in app.js)
 
 ---
 

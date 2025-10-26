@@ -2,9 +2,10 @@ import { TaskCard } from './TaskCard.js';
 import { delegate } from '../../utils/dom.js';
 
 export class ListView {
-  constructor(container, taskStore) {
+  constructor(container, taskStore, getFilteredTasksFn = null) {
     this.container = container;
     this.taskStore = taskStore;
+    this.getFilteredTasksFn = getFilteredTasksFn;
     this.currentFilter = 'all';
     this.currentSort = 'date';
     
@@ -103,17 +104,21 @@ export class ListView {
   }
 
   getFilteredTasks() {
+    // Start with advanced filtered tasks if available, otherwise all tasks
+    const baseTasks = (this.getFilteredTasksFn && this.getFilteredTasksFn()) || this.taskStore.getAll();
+    
     let tasks = [];
 
+    // Apply ListView's own filter on top of advanced filter
     switch (this.currentFilter) {
       case 'all':
-        tasks = this.taskStore.getAll();
+        tasks = baseTasks;
         break;
       case 'active':
-        tasks = this.taskStore.filterByCompleted(false);
+        tasks = baseTasks.filter(t => !t.completed);
         break;
       case 'completed':
-        tasks = this.taskStore.filterByCompleted(true);
+        tasks = baseTasks.filter(t => t.completed);
         break;
     }
 
