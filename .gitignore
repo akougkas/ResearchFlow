@@ -1,0 +1,314 @@
+# ResearchFlow .gitignore
+
+# ============================================
+# Operating System Files
+# ============================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+.nfs*
+
+# ============================================
+# IDE / Editor Files
+# ============================================
+
+# VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+.history/
+
+# JetBrains IDEs (WebStorm, IntelliJ, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Sublime Text
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
+sftp-config.json
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+Session.vim
+Sessionx.vim
+.netrwhist
+tags
+[._]*.un~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ============================================
+# Node.js (if added in future)
+# ============================================
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.npm
+.yarn/
+.pnp.*
+
+# ============================================
+# Python (Development Server)
+# ============================================
+
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# ============================================
+# Logs
+# ============================================
+
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pids/
+*.pid
+*.seed
+*.pid.lock
+lib-cov/
+
+# ============================================
+# Testing & Coverage
+# ============================================
+
+coverage/
+*.lcov
+.nyc_output
+.grunt
+.mocha.json
+.cache
+.parcel-cache
+
+# ============================================
+# Build & Distribution
+# ============================================
+
+dist/
+build/
+*.tgz
+*.tar.gz
+*.zip
+
+# ============================================
+# Temporary Files
+# ============================================
+
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*.swo
+*~.nib
+*.orig
+
+# ============================================
+# Project Specific
+# ============================================
+
+# Temporary summary documents (keep docs/ folder but not temp files)
+*_SUMMARY.md
+*_TASKS.md
+QUICK_START.md
+BUILD_SUMMARY.txt
+TEST_*.md
+PHASE1_REVIEW.md
+INTEGRATION_SUMMARY.md
+
+# Screenshots/test images (optional - uncomment if you want to ignore)
+# snap.png
+# screenshot*.png
+
+# Local development files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Local storage data (for testing)
+localStorage.json
+
+# ============================================
+# Dependency Directories
+# ============================================
+
+bower_components/
+jspm_packages/
+
+# ============================================
+# TypeScript (if added in future)
+# ============================================
+
+*.tsbuildinfo
+
+# ============================================
+# Optional npm cache directory
+# ============================================
+
+.npm
+
+# ============================================
+# Optional eslint cache
+# ============================================
+
+.eslintcache
+
+# ============================================
+# Optional stylelint cache
+# ============================================
+
+.stylelintcache
+
+# ============================================
+# Microbundle cache
+# ============================================
+
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# ============================================
+# Optional REPL history
+# ============================================
+
+.node_repl_history
+
+# ============================================
+# Output of 'npm pack'
+# ============================================
+
+*.tgz
+
+# ============================================
+# Serverless directories
+# ============================================
+
+.serverless/
+
+# ============================================
+# FuseBox cache
+# ============================================
+
+.fusebox/
+
+# ============================================
+# DynamoDB Local files
+# ============================================
+
+.dynamodb/
+
+# ============================================
+# TernJS port file
+# ============================================
+
+.tern-port
+
+# ============================================
+# Stores VSCode versions used for testing VSCode extensions
+# ============================================
+
+.vscode-test
+
+# ============================================
+# yarn v2
+# ============================================
+
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+

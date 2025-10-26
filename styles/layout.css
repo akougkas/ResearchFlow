@@ -1,0 +1,72 @@
+body {
+  background: var(--color-primary-dark);
+  color: var(--color-text-light);
+  font-family: var(--font-body);
+}
+
+.app-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--space-md);
+}
+
+.app-header {
+  text-align: center;
+  padding: var(--space-2xl) 0;
+  border-bottom: 2px solid var(--color-tertiary-dark);
+  margin-bottom: var(--space-xl);
+}
+
+.app-header h1 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-3xl);
+  color: var(--color-accent-gold);
+  margin-bottom: var(--space-sm);
+}
+
+.tagline {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-lg);
+}
+
+.app-main {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xl);
+  margin-bottom: var(--space-2xl);
+}
+
+@media (min-width: 920px) {
+  .app-main {
+    grid-template-columns: 420px 1fr;
+  }
+}
+
+@media (min-width: 1200px) {
+  .app-main {
+    grid-template-columns: 450px 1fr;
+  }
+}
+
+.task-form-container {
+  background: var(--color-secondary-dark);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+.task-list-container {
+  background: var(--color-secondary-dark);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+.app-footer {
+  text-align: center;
+  padding: var(--space-xl);
+  border-top: 2px solid var(--color-tertiary-dark);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
