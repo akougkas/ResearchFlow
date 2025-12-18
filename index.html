@@ -1,91 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="AI-powered research task manager for scientists">
-  <meta name="theme-color" content="#0d1421">
-  <title>ResearchFlow - Smart Research Todo Manager</title>
-  
-  <!-- Styles -->
-  <link rel="stylesheet" href="styles/reset.css?v=3">
-  <link rel="stylesheet" href="styles/variables.css?v=3">
-  <link rel="stylesheet" href="styles/layout.css?v=3">
-  <link rel="stylesheet" href="styles/components.css?v=3">
-  
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="public/manifest.json">
-  
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ResearchFlow // NEO-MODERN CYBERPUNK Interface">
+    <title>ResearchFlow // SYSTEM_ACTIVE</title>
+
+    <!-- FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@400;700;900&display=swap"
+        rel="stylesheet">
+
+    <!-- STYLES (ORDER MATTERS) -->
+    <link rel="stylesheet" href="styles/variables.css">
+    <link rel="stylesheet" href="styles/reset.css">
+    <link rel="stylesheet" href="styles/utils.css">
+    <link rel="stylesheet" href="styles/layout.css">
+    <link rel="stylesheet" href="styles/components.css">
 </head>
+
 <body>
-  <div class="app-container">
-    <header class="app-header">
-      <h1>🔬 ResearchFlow</h1>
-      <p class="tagline">Smart Task Management for Researchers</p>
-    </header>
-    
-    <main class="app-main">
-      <!-- LEFT SIDEBAR: Form + Projects -->
-      <aside class="app-sidebar">
-        <!-- Task Form -->
-        <div class="task-form-container"></div>
-        
-        <!-- Project Manager -->
-        <div class="project-manager">
-          <h3>📁 Projects</h3>
-          <button class="new-project-btn">+ New Project</button>
-          <div class="project-list"></div>
-        </div>
-      </aside>
+    <div id="app" class="full-h full-w bg-grid">
+        <!-- APP CONTENT INJECTED HERE -->
+    </div>
 
-      <!-- CENTER/RIGHT: Views + Controls -->
-      <section class="app-content">
-        <!-- Controls Bar -->
-        <div class="controls-bar">
-          <!-- View Switcher -->
-          <div class="view-controls">
-            <button class="view-btn" data-view="list" title="Ctrl+1">
-              📋 List
-            </button>
-            <button class="view-btn" data-view="kanban" title="Ctrl+2">
-              📊 Kanban
-            </button>
-            <button class="view-btn" data-view="timeline" title="Ctrl+3">
-              📅 Timeline
-            </button>
-          </div>
-
-          <!-- Template Switcher -->
-          <div class="template-switcher-container">
-            <button class="template-switcher">⚡ Load Template</button>
-          </div>
-
-          <!-- Save Indicator -->
-          <div class="save-indicator">💾 Saved</div>
-        </div>
-
-        <!-- Filter Panel (collapsed by default, visible on scroll) -->
-        <div class="filter-panel"></div>
-
-        <!-- Main Task List/View Area -->
-        <div class="task-list-container"></div>
-      </section>
-    </main>
-    
-    <footer class="app-footer">
-      <p>&copy; 2025 ResearchFlow. Designed for researchers, built for productivity.</p>
-      <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-top: 0.5rem;">
-        Shortcuts: <kbd>Ctrl+K</kbd> Quick add • <kbd>Ctrl+1/2/3</kbd> Switch views
-      </p>
-    </footer>
-  </div>
-  
-  <!-- Scripts -->
-  <script type="module" src="src/ui/app.js?v=3"></script>
+    <!-- SCRIPTS -->
+    <script type="module" src="src/ui/app.js"></script>
 </body>
-</html>
 
+</html>

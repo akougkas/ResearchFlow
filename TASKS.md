@@ -13,15 +13,15 @@
 ### What Makes This Special?
 - **Research-Focused Categories**: Data Analysis 📊, Experiments 🧪, Writing 📝, Funding 💰, Presentations 🎤, Literature 📚
 - **Academic Workflows**: Pre-built templates for paper submissions, grant proposals, experiment cycles
-- **Dark Academia Aesthetic**: Professional, distraction-free interface designed for deep work
-- **Intelligent Features**: Smart categorization, productivity insights, dependency tracking
-- **Offline-First PWA**: Works anywhere - even in basement labs with poor signal
+- **Neobrutalist Neomodern Aesthetic**: High-contrast, premium interface designed for high-performance research.
+- **Interactive Graph Intelligence**: Bi-directional linking and dependency visualization.
+- **Offline-First PWA**: Stable discovery in any lab environment.
 
 ### Core Philosophy
-1. **Scientists don't have "tasks"** - they have experiments, deadlines, reviews, and discoveries
-2. **Mobile-first research** - capture ideas quickly during lab work
-3. **Vanilla JavaScript** - fast, reliable, no build complexity
-4. **Progressive enhancement** - start simple, add intelligence incrementally
+1. **Scientists don't have "tasks"** - they have experiments, deadlines, and discoveries.
+2. **Graph-First cognition** - research is non-linear; the tool must be too.
+3. **High-Performance UI** - Neobrutalism for clarity and impact.
+4. **Vanilla JavaScript** - Zero build complexity, maximum transparency.
 
 ---
 

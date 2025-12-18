@@ -4,16 +4,14 @@ An intelligent, **research-focused** todo application designed specifically for 
 
 ## ✨ Features
 
-### Core Features (Phase 1 ✅)
+### Core Features (Phase 1-2 ✅)
+- **Neobrutalist Neomodern UI**: High-impact, premium professional interface.
+- **Interactive Force Graph**: Visualize research clusters and dependencies.
+- **Smart Notebook**: Bi-directional linking with [[Task:id]] support.
 - **Research-Focused Categories**: Data Analysis 📊, Experiments 🧪, Writing 📝, Funding 💰, Presentations 🎤, Literature 📚
-- **Priority Levels**: Critical, High, Normal, Low with visual indicators
-- **Task Management**: Create, read, update, delete, and complete tasks
-- **Filtering & Sorting**: Filter by status (All/Active/Completed), sort by date/priority/due date
-- **Due Dates**: Track deadlines with automatic overdue detection
-- **Dark Academia Theme**: Professional, distraction-free interface
-- **Persistent Storage**: LocalStorage with versioned migration support
-- **Responsive Design**: Works on mobile, tablet, and desktop
-- **Accessibility**: WCAG 2.1 AA compliant keyboard navigation and ARIA labels
+- **Vanilla JS Architecture**: Zero build tools, pure modern ESM.
+- **Persistent Storage**: Robust versioned LocalStorage engine.
+- **Responsive Design**: Mobile-first architecture for lab environments.
 
 ### Coming Soon (Phase 2-4)
 - Research templates (paper submission, grant proposals, experiment cycles)

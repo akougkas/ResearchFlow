@@ -1,0 +1,139 @@
+/* UTILITIES // THE TOOLKIT */
+
+/* TEXT */
+.font-head {
+    font-family: var(--font-head);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.font-mono {
+    font-family: var(--font-mono);
+}
+
+.text-primary {
+    color: var(--color-primary);
+}
+
+.text-secondary {
+    color: var(--color-secondary);
+}
+
+.text-alert {
+    color: var(--color-alert);
+}
+
+.text-muted {
+    color: var(--text-muted);
+}
+
+.text-huge {
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.text-lg {
+    font-size: 1.5rem;
+}
+
+.text-sm {
+    font-size: 0.85rem;
+}
+
+/* LAYOUT */
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.gap-2 {
+    gap: var(--space-2);
+}
+
+.gap-4 {
+    gap: var(--space-4);
+}
+
+.grid-12 {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: var(--space-4);
+}
+
+.full-h {
+    height: 100%;
+}
+
+.full-w {
+    width: 100%;
+}
+
+.scroll-y {
+    overflow-y: auto;
+}
+
+/* DECORATION */
+.border-thin {
+    border: 1px solid var(--border-color);
+}
+
+.border-thick {
+    border: 2px solid var(--border-color);
+}
+
+.border-primary {
+    border-color: var(--color-primary);
+}
+
+.bg-panel {
+    background: var(--bg-panel);
+}
+
+.bg-grid {
+    background-image:
+        linear-gradient(var(--bg-grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+    background-size: 20px 20px;
+    background-position: center top;
+}
+
+/* CLASSES FOR JS LOGIC */
+.hidden {
+    display: none !important;
+}
+
+/* ANIMATIONS */
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.blink {
+    animation: blink 1s step-end infinite;
+}
