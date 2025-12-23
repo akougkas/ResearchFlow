@@ -1,7 +1,7 @@
 import { taskStore } from '../core/taskStore.js';
 import { LandingPage } from './components/LandingPage.js';
-// We will implement TriptychLayout next
-// import { TriptychLayout } from './components/TriptychLayout.js';
+// Import template registry to register built-in templates
+import '../features/templates/index.js';
 
 class App {
     constructor() {

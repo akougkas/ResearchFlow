@@ -1,3 +1,7 @@
+/**
+ * TriptychLayout - Main 3-pane dashboard layout
+ * Coordinates Navigation, TaskMatrix (workspace), and ContextPanel
+ */
 
 import { Navigation } from './Navigation.js';
 import { TaskMatrix } from './TaskMatrix.js';
@@ -8,6 +12,8 @@ export class TriptychLayout {
     constructor(container, taskStore) {
         this.container = container;
         this.taskStore = taskStore;
+        this.contextPanel = null;
+        this.taskMatrix = null;
         this.render();
     }
 
@@ -29,22 +35,41 @@ export class TriptychLayout {
         const workspaceContainer = this.container.querySelector('#workspace-pane');
         const contextContainer = this.container.querySelector('#context-pane');
 
-        // Initialize Components
+        // Initialize Context Panel first (so we can pass callback to TaskMatrix)
+        this.contextPanel = new ContextPanel(contextContainer, this.taskStore);
+
+        // Initialize TaskMatrix with task selection callback
+        this.taskMatrix = new TaskMatrix(workspaceContainer, this.taskStore, {
+            onTaskSelect: (task) => {
+                this.contextPanel.setSelectedTask(task);
+            }
+        });
+
+        // Initialize Navigation
         new Navigation(navContainer, this.handleNavChange.bind(this));
-        new TaskMatrix(workspaceContainer, this.taskStore);
-        new ContextPanel(contextContainer, this.taskStore);
     }
 
     handleNavChange(viewId) {
         if (viewId === 'SETTINGS') {
             const modalContainer = this.container.querySelector('#modal-container');
             new SystemMenu(modalContainer, () => {
-                // On Close
+                // On Close - cleanup if needed
             });
             return;
         }
 
+        // Handle view switching (future: Kanban, Timeline, etc.)
         console.log("Switching view to:", viewId);
-        // Dispatch event or call method on Workspace
+
+        // For now, just show a message for unimplemented views
+        const unimplemented = ['KANBAN', 'TIMELINE', 'GRAPH'];
+        if (unimplemented.includes(viewId)) {
+            alert(`${viewId} view coming soon!\n\nCurrently available:\n• Matrix View (default)`);
+        }
+    }
+
+    destroy() {
+        if (this.contextPanel) this.contextPanel.destroy();
+        if (this.taskMatrix) this.taskMatrix.destroy();
     }
 }
