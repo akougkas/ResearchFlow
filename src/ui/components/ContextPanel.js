@@ -1,6 +1,6 @@
 /**
  * ContextPanel - Right sidebar showing system diagnostics and selected task details
- * Updates dynamically based on task selection
+ * Updates dynamically based on task selection with bi-directional link support.
  */
 
 import { getCategoryById } from '../../config/categories.js';
@@ -42,7 +42,6 @@ export class ContextPanel {
     }
 
     renderOverview(stats) {
-        // Category breakdown
         const categories = ['data', 'experiment', 'writing', 'funding', 'presentation', 'literature'];
         const categoryStats = categories.map(catId => {
             const cat = getCategoryById(catId);
@@ -113,7 +112,6 @@ export class ContextPanel {
         const category = getCategoryById(task.category);
         const priority = getPriorityByLevel(task.priority);
 
-        // Calculate days until/since due
         let dueStatus = '';
         if (task.dueDate) {
             const dueDate = new Date(task.dueDate);
@@ -131,7 +129,6 @@ export class ContextPanel {
             }
         }
 
-        // Check dependencies
         const canComplete = this.taskStore.canComplete(task.id);
         const dependentTasks = this.taskStore.getDependentTasks(task.id);
 
@@ -191,11 +188,11 @@ export class ContextPanel {
                 </div>
                 ` : ''}
 
-                <!-- NOTES -->
+                <!-- NOTES WITH WIKI LINKS -->
                 ${task.notes ? `
                 <div class="detail-field">
-                    <div class="detail-label">NOTES</div>
-                    <div class="detail-value text-sm" style="white-space: pre-wrap;">${this.escapeHtml(task.notes)}</div>
+                    <div class="detail-label">NOTES & REFERENCES</div>
+                    <div class="detail-value text-sm" style="white-space: pre-wrap;">${this.formatNotesWithWikiLinks(task.notes)}</div>
                 </div>
                 ` : ''}
 
@@ -208,10 +205,11 @@ export class ContextPanel {
                             const depTask = this.taskStore.getById(depId);
                             if (!depTask) return '';
                             return `
-                                <div class="flex-between text-xs margin-bottom-1">
+                                <div class="flex-between text-xs margin-bottom-1 cursor-pointer hover-text-primary btn-jump-task" data-id="${depTask.id}">
                                     <span class="${depTask.completed ? 'text-success' : 'text-muted'}">
-                                        ${depTask.completed ? '●' : '○'} ${this.escapeHtml(depTask.text.slice(0, 30))}...
+                                        ${depTask.completed ? '●' : '○'} ${this.escapeHtml(depTask.text.slice(0, 28))}...
                                     </span>
+                                    <span class="text-secondary text-xs">🔗</span>
                                 </div>
                             `;
                         }).join('')}
@@ -225,14 +223,18 @@ export class ContextPanel {
                 <!-- DEPENDENTS -->
                 ${dependentTasks.length > 0 ? `
                 <div class="detail-field">
-                    <div class="detail-label">BLOCKS</div>
+                    <div class="detail-label">BLOCKS PROTOCOLS</div>
                     <div class="detail-value text-sm text-muted">
-                        ${dependentTasks.length} task(s) depend on this
+                        ${dependentTasks.map(dT => `
+                            <div class="text-xs margin-bottom-1 cursor-pointer hover-text-primary btn-jump-task" data-id="${dT.id}">
+                                ↳ ${this.escapeHtml(dT.text.slice(0, 28))}...
+                            </div>
+                        `).join('')}
                     </div>
                 </div>
                 ` : ''}
 
-                <!-- TIMESTAMPS -->
+                <!-- METADATA -->
                 <div class="detail-field margin-top-3">
                     <div class="detail-label">METADATA</div>
                     <div class="detail-value text-xs text-muted">
@@ -255,8 +257,19 @@ export class ContextPanel {
         `;
     }
 
+    formatNotesWithWikiLinks(notes) {
+        if (!notes) return '';
+        const escaped = this.escapeHtml(notes);
+
+        // Replace [[Task:id]] or [[id]] with clickable span link
+        return escaped.replace(/\[\[(?:Task:)?([a-zA-Z0-9_\-]+)\]\]/g, (match, taskId) => {
+            const targetTask = this.taskStore.getById(taskId);
+            const label = targetTask ? targetTask.text.slice(0, 20) + '...' : taskId;
+            return `<span class="btn-jump-task text-secondary underline cursor-pointer" data-id="${taskId}">[[🔗 ${label}]]</span>`;
+        });
+    }
+
     attachEvents() {
-        // Back button
         const backBtn = this.container.querySelector('#btn-back');
         if (backBtn) {
             backBtn.addEventListener('click', () => {
@@ -264,6 +277,19 @@ export class ContextPanel {
                 this.render();
             });
         }
+
+        // Jump to task link handlers
+        this.container.querySelectorAll('.btn-jump-task').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.dataset.id;
+                const targetTask = this.taskStore.getById(targetId);
+                if (targetTask) {
+                    this.setSelectedTask(targetTask);
+                } else {
+                    alert(`Referenced task [${targetId}] not found in workspace.`);
+                }
+            });
+        });
 
         // Toggle complete
         const toggleBtn = this.container.querySelector('#btn-toggle');
@@ -314,11 +340,10 @@ export class ContextPanel {
             });
         }
 
-        // Templates button - opens template modal
+        // Templates button
         const templatesBtn = this.container.querySelector('#btn-templates');
         if (templatesBtn) {
             templatesBtn.addEventListener('click', () => {
-                // Create a modal container in the parent (outside context panel scroll)
                 let modalContainer = document.querySelector('#template-modal-layer');
                 if (!modalContainer) {
                     modalContainer = document.createElement('div');

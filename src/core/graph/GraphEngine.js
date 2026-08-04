@@ -13,6 +13,7 @@ export class GraphEngine {
 
         this.nodes = [];
         this.links = [];
+        this.searchQuery = '';
 
         // Camera transform (pan & zoom)
         this.transform = { x: 0, y: 0, scale: 1 };
@@ -30,6 +31,10 @@ export class GraphEngine {
         this.isRunning = false;
 
         this.initEvents();
+    }
+
+    setSearchQuery(query) {
+        this.searchQuery = (query || '').toLowerCase().trim();
     }
 
     /**
@@ -103,7 +108,7 @@ export class GraphEngine {
             }
         });
 
-        // 3. Add Dependency Links between Task Nodes
+        // 3. Add Dependency Links & bi-directional notebook links
         tasks.forEach((task) => {
             if (Array.isArray(task.dependencies)) {
                 const targetNode = nodeMap.get(task.id);
@@ -138,9 +143,6 @@ export class GraphEngine {
         }
     }
 
-    /**
-     * Physics simulation step + render frame
-     */
     tick() {
         if (!this.isRunning) return;
 
@@ -248,7 +250,6 @@ export class GraphEngine {
                 ctx.lineWidth = isSelected ? 2 : 1;
                 ctx.setLineDash([3, 3]);
             } else {
-                // Task dependency link
                 ctx.strokeStyle = isSelected ? '#FF2A2A' : '#F3F91A';
                 ctx.lineWidth = isSelected ? 2.5 : 1.5;
                 ctx.setLineDash([]);
@@ -256,7 +257,6 @@ export class GraphEngine {
             ctx.stroke();
             ctx.setLineDash([]);
 
-            // Draw Arrowhead for dependency links
             if (!link.isHubLink) {
                 this.drawArrowhead(ctx, link.source, link.target, link.target.radius + 2);
             }
@@ -266,22 +266,23 @@ export class GraphEngine {
         this.nodes.forEach((n) => {
             const isSelected = this.selectedNodeId === n.id;
             const isHovered = this.hoveredNode === n;
+            const matchesSearch = this.searchQuery && n.fullText && n.fullText.toLowerCase().includes(this.searchQuery);
 
-            // Halo for selected/hovered nodes
-            if (isSelected || isHovered) {
+            // Halo for selected / hovered / search matched nodes
+            if (isSelected || isHovered || matchesSearch) {
                 ctx.beginPath();
-                ctx.arc(n.x, n.y, n.radius + (isSelected ? 8 : 5), 0, Math.PI * 2);
-                ctx.fillStyle = isSelected ? 'rgba(243, 249, 26, 0.25)' : 'rgba(0, 240, 255, 0.2)';
+                ctx.arc(n.x, n.y, n.radius + (isSelected || matchesSearch ? 9 : 5), 0, Math.PI * 2);
+                ctx.fillStyle = matchesSearch ? 'rgba(255, 42, 42, 0.35)' : isSelected ? 'rgba(243, 249, 26, 0.25)' : 'rgba(0, 240, 255, 0.2)';
                 ctx.fill();
-                ctx.strokeStyle = isSelected ? '#F3F91A' : '#00F0FF';
-                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = matchesSearch ? '#FF2A2A' : isSelected ? '#F3F91A' : '#00F0FF';
+                ctx.lineWidth = 2;
                 ctx.stroke();
             }
 
             // Node Circle
             ctx.beginPath();
             ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
-            ctx.fillStyle = n.color;
+            ctx.fillStyle = matchesSearch ? '#FF2A2A' : n.color;
             ctx.fill();
             ctx.strokeStyle = n.isHub ? '#FFFFFF' : '#000000';
             ctx.lineWidth = n.isHub ? 2 : 1.5;
@@ -289,7 +290,7 @@ export class GraphEngine {
 
             // Node Label
             ctx.font = n.isHub ? 'bold 11px "JetBrains Mono", monospace' : '10px "JetBrains Mono", monospace';
-            ctx.fillStyle = n.isHub ? '#FFFFFF' : (isSelected ? '#F3F91A' : '#D0D7DE');
+            ctx.fillStyle = matchesSearch ? '#FF2A2A' : n.isHub ? '#FFFFFF' : (isSelected ? '#F3F91A' : '#D0D7DE');
             ctx.textAlign = 'center';
             ctx.fillText(n.label, n.x, n.y + n.radius + 14);
         });
@@ -331,7 +332,6 @@ export class GraphEngine {
             const mouseX = clientX - rect.left;
             const mouseY = clientY - rect.top;
 
-            // Inverse transform to world coordinates
             const worldX = (mouseX - this.transform.x) / this.transform.scale;
             const worldY = (mouseY - this.transform.y) / this.transform.scale;
 
@@ -397,7 +397,6 @@ export class GraphEngine {
             const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
             const newScale = Math.max(0.4, Math.min(3.0, this.transform.scale * zoomFactor));
 
-            // Zoom centered on mouse cursor
             this.transform.x = mouseX - (mouseX - this.transform.x) * (newScale / this.transform.scale);
             this.transform.y = mouseY - (mouseY - this.transform.y) * (newScale / this.transform.scale);
             this.transform.scale = newScale;

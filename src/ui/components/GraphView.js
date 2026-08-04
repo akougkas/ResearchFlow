@@ -1,6 +1,6 @@
 /**
  * GraphView - Interactive Force Graph View Component
- * Wraps GraphEngine with container sizing, HUD controls, and detail callbacks.
+ * Wraps GraphEngine with container sizing, HUD controls, live search, and detail callbacks.
  */
 
 import { GraphEngine } from '../../core/graph/GraphEngine.js';
@@ -29,7 +29,8 @@ export class GraphView {
                             FORCE_SIMULATION :: DRAG NODES | PAN / ZOOM | CLICK TO SELECT
                         </div>
                     </div>
-                    <div class="hud-controls flex gap-2 pointer-events-auto">
+                    <div class="hud-controls flex gap-2 pointer-events-auto align-center">
+                        <input type="text" id="graph-search-input" class="input-tactical text-xs padding-x-2 padding-y-1 font-mono max-w-200" placeholder="Filter nodes...">
                         <button id="graph-reset-btn" class="btn-tactical text-xs padding-x-2 padding-y-1 font-mono">
                             [RESET CAMERA]
                         </button>
@@ -67,6 +68,16 @@ export class GraphView {
             }
         });
         this.resizeObserver.observe(wrapper);
+
+        // Search input
+        const searchInput = this.container.querySelector('#graph-search-input');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                if (this.graphEngine) {
+                    this.graphEngine.setSearchQuery(e.target.value);
+                }
+            });
+        }
 
         // Reset camera button
         const resetBtn = this.container.querySelector('#graph-reset-btn');
