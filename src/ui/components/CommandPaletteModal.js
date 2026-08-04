@@ -28,6 +28,7 @@ export class CommandPaletteModal {
             { id: 'ACT_NEW', label: '+ CREATE NEW TASK PROTOCOL', type: 'action', viewId: 'NEW_TASK' },
             { id: 'ACT_AI', label: '🤖 AI TASK GENERATOR', type: 'action', viewId: 'AI_GEN' },
             { id: 'ACT_VOICE', label: '🎙️ VOICE DICTATION', type: 'action', viewId: 'VOICE' },
+            { id: 'ACT_ANALYTICS', label: '📈 PRODUCTIVITY ANALYTICS', type: 'action', viewId: 'ANALYTICS' },
             { id: 'ACT_TEMPLATES', label: '📚 WORKFLOW TEMPLATES', type: 'action', viewId: 'TEMPLATES' },
             { id: 'ACT_MATRIX', label: '▦ SWITCH TO MATRIX VIEW', type: 'action', viewId: 'MATRIX' },
             { id: 'ACT_KANBAN', label: '📋 SWITCH TO KANBAN VIEW', type: 'action', viewId: 'KANBAN' },

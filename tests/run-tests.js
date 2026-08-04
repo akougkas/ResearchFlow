@@ -100,6 +100,16 @@ async function runTests() {
     assert(voiceEngine.autoCategorize('Draft section 3 of paper manuscript') === 'writing', 'Auto-detects writing category');
     assert(voiceEngine.autoCategorize('Submit NSF proposal budget') === 'funding', 'Auto-detects funding category');
 
+    // TEST 6: Analytics & Dependency Bottlenecks
+    console.log('\n--- TEST GROUP 6: Productivity Analytics & Bottleneck Engine ---');
+    const stats = taskStore.getStats();
+    assert(typeof stats.total === 'number' && stats.total > 0, 'TaskStore computes overall statistics correctly');
+    const uncompletedA = taskStore.create({ text: 'Root Bottleneck Protocol', category: 'experiment' });
+    const dep1 = taskStore.create({ text: 'Child 1', category: 'data', dependencies: [uncompletedA.id] });
+    const dep2 = taskStore.create({ text: 'Child 2', category: 'writing', dependencies: [uncompletedA.id] });
+    const dependentsOfRoot = taskStore.getDependentTasks(uncompletedA.id);
+    assert(dependentsOfRoot.length === 2, 'Identifies root protocol blocking multiple dependent tasks');
+
     // SUMMARY
     console.log('\n========================================');
     console.log(`📊 TEST RESULTS: ${passed} PASSED, ${failed} FAILED`);

@@ -14,6 +14,7 @@ import { AITaskModal } from './AITaskModal.js';
 import { TemplateModal } from './TemplateModal.js';
 import { VoiceCaptureModal } from './VoiceCaptureModal.js';
 import { CommandPaletteModal } from './CommandPaletteModal.js';
+import { AnalyticsModal } from './AnalyticsModal.js';
 import { CATEGORIES } from '../../config/categories.js';
 
 export class TriptychLayout {
@@ -135,6 +136,14 @@ export class TriptychLayout {
         if (viewId === 'VOICE') {
             const modalContainer = this.container.querySelector('#modal-container');
             new VoiceCaptureModal(modalContainer, {
+                taskStore: this.taskStore
+            });
+            return;
+        }
+
+        if (viewId === 'ANALYTICS') {
+            const modalContainer = this.container.querySelector('#modal-container');
+            new AnalyticsModal(modalContainer, {
                 taskStore: this.taskStore
             });
             return;

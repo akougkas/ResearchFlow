@@ -18,7 +18,7 @@ export class Navigation {
             <div class="nav-header padding-3 border-bottom-thick border-primary flex-col">
                 <div class="flex-between align-center">
                     <div class="text-primary font-head text-lg tracking-wider">R_FLOW</div>
-                    <span class="badge border-thin text-xs text-success font-mono">ALPHA</span>
+                    <span class="badge border-thin text-xs text-success font-mono">BETA</span>
                 </div>
                 <div class="text-muted font-mono text-xs margin-top-1">RESEARCHFLOW V1.0</div>
             </div>
@@ -56,6 +56,10 @@ export class Navigation {
                 <button class="nav-item flex align-center gap-2 padding-2 border-thin text-left bg-transparent text-secondary transition-all hover-glow" data-id="VOICE">
                     <span class="icon">🎙️</span>
                     <span class="label font-mono uppercase">VOICE CAPTURE</span>
+                </button>
+                <button class="nav-item flex align-center gap-2 padding-2 border-thin text-left bg-transparent text-success transition-all hover-glow" data-id="ANALYTICS">
+                    <span class="icon">📈</span>
+                    <span class="label font-mono uppercase">ANALYTICS</span>
                 </button>
 
                 <!-- CATEGORIES SECTION -->
