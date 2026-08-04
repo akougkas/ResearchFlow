@@ -1,6 +1,6 @@
 /**
  * TaskModal - Neobrutalist modal for task creation/editing
- * Matches the cyberpunk aesthetic of ResearchFlow
+ * Matches the cyberpunk aesthetic of ResearchFlow and supports task dependency selection.
  */
 
 import { CATEGORIES } from '../../config/categories.js';
@@ -12,6 +12,7 @@ export class TaskModal {
         this.onSave = options.onSave || (() => {});
         this.onClose = options.onClose || (() => {});
         this.task = options.task || null; // null = create, object = edit
+        this.allTasks = options.allTasks || []; // Available tasks for dependencies
         this.render();
     }
 
@@ -19,9 +20,13 @@ export class TaskModal {
         const isEdit = !!this.task;
         const title = isEdit ? 'EDIT_PROTOCOL' : 'INIT_NEW_PROTOCOL';
 
+        // Filter out current task from dependency options to prevent self-dependency
+        const availableDeps = this.allTasks.filter(t => !isEdit || t.id !== this.task.id);
+        const selectedDeps = new Set(this.task?.dependencies || []);
+
         this.container.innerHTML = `
             <div class="modal-overlay" id="modal-overlay">
-                <div class="modal-container">
+                <div class="modal-container" style="max-height: 90vh; overflow-y: auto;">
                     <div class="modal-header border-bottom-thick padding-3">
                         <div class="flex-between align-center">
                             <div class="font-head text-primary text-lg">${title}</div>
@@ -44,7 +49,7 @@ export class TaskModal {
                                 class="input-field full-w"
                                 placeholder="e.g., Analyze RNA-seq differential expression..."
                                 maxlength="500"
-                                value="${this.task?.text || ''}"
+                                value="${this.escapeHtml(this.task?.text || '')}"
                                 required
                             />
                             <div class="text-xs text-muted margin-top-1">
@@ -94,6 +99,23 @@ export class TaskModal {
                             />
                         </div>
 
+                        <!-- DEPENDENCIES -->
+                        ${availableDeps.length > 0 ? `
+                        <div class="form-field margin-bottom-3">
+                            <label class="font-mono text-xs text-muted uppercase margin-bottom-1 block">
+                                DEPENDENCIES (PREREQUISITES)
+                            </label>
+                            <div class="border-thin padding-2 scroll-y bg-dim" style="max-height: 120px;">
+                                ${availableDeps.map(dep => `
+                                    <label class="flex align-center gap-2 padding-y-1 font-mono text-xs cursor-pointer hover-text-primary">
+                                        <input type="checkbox" name="task-deps" value="${dep.id}" ${selectedDeps.has(dep.id) ? 'checked' : ''} />
+                                        <span>[${dep.completed ? '✓' : '○'}] ${this.escapeHtml(dep.text.slice(0, 45))}</span>
+                                    </label>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+
                         <!-- NOTES -->
                         <div class="form-field margin-bottom-3">
                             <label class="font-mono text-xs text-muted uppercase margin-bottom-1 block">
@@ -104,7 +126,7 @@ export class TaskModal {
                                 class="input-field full-w"
                                 rows="3"
                                 placeholder="Additional notes, references, or bi-directional links..."
-                            >${this.task?.notes || ''}</textarea>
+                            >${this.escapeHtml(this.task?.notes || '')}</textarea>
                         </div>
 
                         <!-- ERROR MESSAGE -->
@@ -170,6 +192,10 @@ export class TaskModal {
         const notesInput = this.container.querySelector('#task-notes');
         const errorDiv = this.container.querySelector('#form-error');
 
+        // Selected dependencies
+        const depCheckboxes = this.container.querySelectorAll('input[name="task-deps"]:checked');
+        const dependencies = Array.from(depCheckboxes).map(cb => cb.value);
+
         // Validation
         const text = textInput.value.trim();
         if (!text) {
@@ -190,6 +216,7 @@ export class TaskModal {
             category: categoryInput.value,
             priority: priorityInput.value,
             dueDate: dueDateInput.value || null,
+            dependencies: dependencies,
             notes: notesInput.value.trim()
         };
 
@@ -210,6 +237,12 @@ export class TaskModal {
         const errorDiv = this.container.querySelector('#form-error');
         errorDiv.textContent = message;
         errorDiv.classList.remove('hidden');
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text || '';
+        return div.innerHTML;
     }
 
     close() {

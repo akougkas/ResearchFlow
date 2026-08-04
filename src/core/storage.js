@@ -1,3 +1,5 @@
+import { db } from '../data/Database.js';
+
 // Versioned storage keys for safe data migration
 const STORAGE_KEYS = {
   tasks: 'rf.tasks.v1',
@@ -9,9 +11,20 @@ class StorageManager {
   constructor() {
     this.keys = STORAGE_KEYS;
     this.version = 1;
+    this.initDatabase();
   }
 
-  // Save data to a specific versioned key
+  async initDatabase() {
+    try {
+      if (typeof window !== 'undefined' && 'indexedDB' in window) {
+        await db.open();
+      }
+    } catch (err) {
+      console.warn('IndexedDB initialization deferred or unavailable:', err);
+    }
+  }
+
+  // Save data to a specific versioned key and sync to IndexedDB
   save(key, data) {
     try {
       const storageKey = this.keys[key];
@@ -25,7 +38,19 @@ class StorageManager {
         data: data
       };
       
-      localStorage.setItem(storageKey, JSON.stringify(payload));
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(storageKey, JSON.stringify(payload));
+      }
+
+      // Async backup sync to IndexedDB if open
+      if (db && db.isOpen) {
+        if (key === 'tasks' && Array.isArray(data)) {
+          Promise.all(data.map(t => db.tasks.put(t))).catch(err => console.warn('IndexedDB task sync error:', err));
+        } else if (key === 'projects' && Array.isArray(data)) {
+          Promise.all(data.map(p => db.projects.put(p))).catch(err => console.warn('IndexedDB project sync error:', err));
+        }
+      }
+
       return true;
     } catch (error) {
       if (error.name === 'QuotaExceededError') {
@@ -44,6 +69,8 @@ class StorageManager {
       if (!storageKey) {
         throw new Error(`Unknown storage key: ${key}`);
       }
+
+      if (typeof localStorage === 'undefined') return null;
 
       const raw = localStorage.getItem(storageKey);
       if (!raw) return null;
@@ -70,7 +97,9 @@ class StorageManager {
         throw new Error(`Unknown storage key: ${key}`);
       }
       
-      localStorage.removeItem(storageKey);
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem(storageKey);
+      }
       return true;
     } catch (error) {
       console.error('Storage remove failed:', error);
@@ -81,9 +110,11 @@ class StorageManager {
   // Clear all ResearchFlow data
   clearAll() {
     try {
-      Object.values(this.keys).forEach(key => {
-        localStorage.removeItem(key);
-      });
+      if (typeof localStorage !== 'undefined') {
+        Object.values(this.keys).forEach(key => {
+          localStorage.removeItem(key);
+        });
+      }
       return true;
     } catch (error) {
       console.error('Storage clear failed:', error);

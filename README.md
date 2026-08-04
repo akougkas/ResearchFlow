@@ -1,38 +1,26 @@
-# 🔬 ResearchFlow
+# 🔬 ResearchFlow (v1.0 Beta)
 
-An intelligent, **research-focused** todo application designed specifically for scientists, PhD students, and academic teams. Not just another task manager—it's a smart research assistant that understands the unique workflows of scientific discovery.
+An intelligent, **research-focused** task manager designed specifically for scientists, PhD students, and academic teams. Not just another task manager—it's a smart research assistant that understands the unique workflows of scientific discovery.
 
-## ✨ Features
+## ✨ Features (Beta Release ✅)
 
-### Core Features (Phase 1-2 ✅)
-- **Neobrutalist Neomodern UI**: High-impact, premium professional interface.
-- **Interactive Force Graph**: Visualize research clusters and dependencies.
-- **Smart Notebook**: Bi-directional linking with [[Task:id]] support.
-- **Research-Focused Categories**: Data Analysis 📊, Experiments 🧪, Writing 📝, Funding 💰, Presentations 🎤, Literature 📚
-- **Vanilla JS Architecture**: Zero build tools, pure modern ESM.
-- **Persistent Storage**: Robust versioned LocalStorage engine.
-- **Responsive Design**: Mobile-first architecture for lab environments.
-
-### Coming Soon (Phase 2-4)
-- Research templates (paper submission, grant proposals, experiment cycles)
-- Task dependencies and blocking logic
-- Kanban and timeline views
-- AI-powered categorization and insights
-- Voice-to-text task capture
-- PWA with offline support
-- Export/import functionality
+- 🕸️ **Interactive Force Graph**: Canvas-based physics graph visualizing research clusters, node search, and bi-directional relationships.
+- 📋 **Kanban Board & Timeline Views**: Dynamic workflow pipeline and chronological task management.
+- 🔗 **Bi-Directional Wiki Notebook**: Clickable `[[Task:id]]` links with automatic backlinking and navigation.
+- 🔒 **Task Dependency & Blocking Engine**: Multi-task dependency selection with circular dependency detection and blocked protocol indicators.
+- 🎙️ **Voice-to-Text Research Capture**: Hands-free lab dictation with auto-categorization based on scientific keywords.
+- ⚡ **Command Palette & Global Shortcuts**: Instant search and navigation with `Cmd+K` / `/` and `1-4` view keys.
+- 🤖 **AI Task Breakdown Generator**: Natural language task breakdown engine with academic presets (Paper submission, Grant proposal, Experiment cycle).
+- 💾 **IndexedDB + LocalStorage Sync Engine**: Quota-safe storage with versioning, JSON workspace backup/restore, and Markdown notebook generation.
+- ⚡ **Offline PWA Service Worker**: Lab-ready PWA with offline caching.
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- Modern web browser (Chrome, Firefox, Safari, Edge)
-- Python 3.7+ (for local development server)
-
-### Installation & Running
+### Development Server
 
 ```bash
-# Clone or navigate to project
-cd /path/to/ResearchFlow
+# Navigate to project
+cd /home/akougkas/projects/ResearchFlow
 
 # Start local development server
 python -m http.server 8000
@@ -41,6 +29,25 @@ python -m http.server 8000
 # Navigate to http://localhost:8000
 ```
 
+### Running Automated Test Suite
+
+```bash
+# Run 21-test unit & integration suite
+node tests/run-tests.js
+```
+
+## ⌨️ Keyboard Shortcuts
+
+| Shortcut | Action |
+| --- | --- |
+| `Cmd+K` / `Ctrl+K` or `/` | Open Command Palette & Global Search |
+| `Cmd+N` / `Ctrl+N` | Create New Research Protocol |
+| `1` | Switch to Matrix Grid |
+| `2` | Switch to Kanban Board |
+| `3` | Switch to Timeline View |
+| `4` | Switch to Force Graph |
+| `ESC` | Close Modals / Command Palette |
+
 ## 📁 Project Structure
 
 ```
@@ -48,191 +55,52 @@ ResearchFlow/
 ├── src/
 │   ├── core/                    # Business logic
 │   │   ├── data-models.js       # Task & Project classes
-│   │   ├── taskStore.js         # State management with observer pattern
-│   │   └── storage.js           # Versioned localStorage manager
-│   ├── config/                  # Configuration
-│   │   ├── categories.js        # Research categories
-│   │   └── priorities.js        # Priority levels
+│   │   ├── taskStore.js         # Observer-pattern central state store
+│   │   ├── storage.js           # LocalStorage + IndexedDB sync manager
+│   │   ├── exportImport.js      # JSON & Markdown export engine
+│   │   └── graph/GraphEngine.js # Force-directed Canvas physics graph
+│   ├── data/                    # IndexedDB repository layer
+│   │   ├── Database.js          # IndexedDB orchestrator
+│   │   └── repositories/        # Repository pattern entities
+│   ├── features/                # AI, Templates, & Voice Dictation
+│   │   ├── ai/TaskBreakdownEngine.js
+│   │   ├── voice-capture.js    # SpeechRecognition dictation engine
+│   │   └── templates/           # Pre-built academic workflows
 │   ├── ui/
-│   │   ├── app.js               # Main application controller
-│   │   └── components/          # UI components
-│   │       ├── TaskForm.js      # Task creation form
-│   │       ├── TaskCard.js      # Individual task display
-│   │       └── ListView.js      # Task list with filtering/sorting
-│   ├── utils/
-│   │   └── dom.js               # DOM utilities with event delegation
-│   └── features/                # Research-specific features (Phase 2+)
-├── styles/
-│   ├── reset.css               # Browser reset
-│   ├── variables.css           # Theme variables
-│   ├── layout.css              # Layout grid
-│   └── components.css          # Component styles
+│   │   ├── app.js               # Application entry point
+│   │   └── components/          # Neobrutalist UI components
+│   │       ├── TriptychLayout.js
+│   │       ├── TaskMatrix.js
+│   │       ├── KanbanView.js
+│   │       ├── TimelineView.js
+│   │       ├── GraphView.js
+│   │       ├── ContextPanel.js
+│   │       ├── TaskModal.js
+│   │       ├── AITaskModal.js
+│   │       ├── VoiceCaptureModal.js
+│   │       ├── CommandPaletteModal.js
+│   │       └── SystemMenu.js
+│   └── config/                  # Categories & Priorities constants
+├── tests/
+│   └── run-tests.js             # Automated unit & integration test runner
 ├── public/
-│   └── manifest.json           # PWA manifest
-├── index.html                  # Main application
-└── README.md                   # This file
+│   ├── sw.js                    # PWA Service Worker
+│   └── manifest.json            # PWA manifest
+├── index.html                   # Main application
+└── README.md
 ```
-
-## 🏗️ Architecture
-
-### Observer Pattern for Reactive Updates
-The application uses the **Observer Pattern** for state management:
-
-1. **TaskStore** manages application state
-2. **Components subscribe** to state changes via `subscribe(callback)`
-3. **Store notifies** subscribers when data changes
-4. **UI auto-updates** without manual render calls
-
-Benefits:
-- Decoupled components
-- Predictable data flow
-- Automatic re-renders
-- No manual DOM manipulation
-
-### Event Delegation
-Components use **event delegation** at the container level instead of individual elements:
-
-```javascript
-// One listener for all buttons, not one per button
-delegate(container, 'click', '.btn-delete', handleDelete);
-```
-
-Benefits:
-- Better performance with large lists
-- Works with dynamically added elements
-- Less memory overhead
-
-## 🎨 Design System
-
-### Color Palette (Dark Academia Theme)
-- **Primary**: `#0d1421` (Deep Navy)
-- **Secondary**: `#1e293b` (Slate)
-- **Accent Gold**: `#f4a261` (Warm Gold)
-- **Text Light**: `#f1f5f9` (Off-white)
-- **Danger**: `#ef4444` (Red)
-- **Success**: `#10b981` (Emerald)
-
-### Typography
-- **Headings**: Crimson Text (serif)
-- **Body**: Inter (sans-serif)
-- **Mono**: JetBrains Mono (monospace)
-
-### Spacing System
-- Base unit: 0.25rem (4px)
-- Modular scale: xs, sm, md, lg, xl, 2xl, 3xl
 
 ## 🧪 Testing
 
-### Manual Testing Checklist
+Execute unit and integration tests covering data models, taskStore dependencies, bi-directional linking, JSON/Markdown export, and voice auto-categorization:
 
-**Task Creation**
-- [ ] Create task with all fields
-- [ ] Create task with minimal fields
-- [ ] Validate empty text shows error
-- [ ] Test all 6 categories
-- [ ] Test all 4 priority levels
-- [ ] Test date picker
-
-**Task Display**
-- [ ] Category icons show correctly
-- [ ] Priority badges render
-- [ ] Due dates format correctly
-- [ ] Overdue tasks highlight
-
-**Actions**
-- [ ] Toggle completion
-- [ ] Delete with confirmation
-- [ ] Permanent removal verified
-
-**Filtering & Sorting**
-- [ ] Filter All/Active/Completed
-- [ ] Sort by Date/Priority/Due Date
-- [ ] Empty state shows appropriately
-
-**Data Persistence**
-- [ ] Tasks save to localStorage
-- [ ] Page refresh preserves tasks
-- [ ] localStorage keys are versioned
-
-**Responsive**
-- [ ] Mobile (320px): Single column
-- [ ] Tablet (768px): Sidebar layout
-- [ ] Desktop (1024px+): Full layout
-
-**Accessibility**
-- [ ] Keyboard navigation (Tab, Enter, Space)
-- [ ] Form labels associated
-- [ ] ARIA labels present
-- [ ] Color contrast meets WCAG AA
-
-## 🔧 Development Principles
-
-1. **Read → Edit → Verify → Test**: Always read files before editing, verify changes applied, then test
-2. **Observer Pattern**: Use subscribe/notify, not manual renders
-3. **Event Delegation**: Attach listeners to containers, not individual elements
-4. **Versioned Storage**: Use namespaced keys (rf.tasks.v1) for safe migrations
-5. **Mobile-First**: Design for mobile, enhance for desktop
-6. **ES6+ Syntax**: Modern JavaScript features throughout
-7. **Error Handling**: Try-catch blocks for data operations
-8. **Validation**: Validate all user inputs before saving
-
-## 📊 Task Data Structure
-
-```javascript
-{
-  id: "task_1699000000000_abc123def",
-  text: "Analyze RNA-seq results",
-  category: "data",           // data | experiment | writing | funding | presentation | literature
-  priority: "high",           // critical | high | normal | low
-  completed: false,
-  dueDate: "2025-11-15",     // ISO date string or null
-  createdAt: 1699000000000,  // Unix timestamp
-  updatedAt: 1699000000000,  // Unix timestamp
-  tags: [],                  // Future: Phase 2+
-  notes: "",                 // Future: Phase 2+
-  dependencies: [],          // Future: Phase 2+
-  projectId: null            // Future: Phase 2+
-}
+```bash
+node tests/run-tests.js
 ```
-
-## 🚀 Performance
-
-### Targets
-- Page load: < 3 seconds
-- Animations: 60fps
-- Memory usage: < 10MB with 100+ tasks
-- Storage usage: < 1MB for 500 tasks
-
-### Optimizations
-- Vanilla JavaScript (no framework overhead)
-- Event delegation (fewer listeners)
-- LocalStorage caching (fast access)
-- CSS animations (GPU accelerated)
-
-## 🐛 Known Limitations & Future Work
-
-### Phase 1 (Current)
-✅ Basic CRUD operations
-✅ Filtering and sorting
-✅ Dark academia theme
-✅ Responsive design
-❌ Task editing (Phase 2)
-❌ Task dependencies
-❌ Advanced views (Kanban, Timeline)
-❌ AI features
-❌ PWA offline support
-❌ Collaboration
-
-## 📝 License
-
-Educational project created for research workflow optimization.
-
-## 📞 Support
-
-For bugs or feature requests, please refer to TASKS.md for the development roadmap.
 
 ---
 
 **Built with ❤️ for researchers**  
-*Making scientific research management smarter, one task at a time.*
+*Making scientific research management smarter, one protocol at a time.*
+
 

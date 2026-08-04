@@ -109,6 +109,7 @@ export class TaskMatrix {
         const isSelected = this.selectedTaskId === task.id;
         const isCompleted = task.completed;
         const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && !task.completed;
+        const isBlocked = !task.completed && !this.taskStore.canComplete(task.id);
         const category = getCategoryById(task.category);
         const priority = getPriorityByLevel(task.priority);
 
@@ -133,18 +134,19 @@ export class TaskMatrix {
         const shortId = task.id.split('_')[2]?.slice(0, 6) || 'ERR';
 
         return `
-            <div class="matrix-row item ${isCompleted ? 'completed' : ''} ${isSelected ? 'selected' : ''} ${isOverdue ? 'overdue' : ''}
+            <div class="matrix-row item ${isCompleted ? 'completed' : ''} ${isSelected ? 'selected' : ''} ${isOverdue ? 'overdue' : ''} ${isBlocked ? 'blocked' : ''}
                         flex align-center border-bottom-thin padding-y-2 hover-bg-dim transition-all"
                  data-id="${task.id}">
                 <div class="col-status text-center">
-                    <div class="status-indicator ${isCompleted ? 'bg-success' : isOverdue ? 'bg-alert' : 'bg-primary'}"
+                    <div class="status-indicator ${isCompleted ? 'bg-success' : isBlocked ? 'bg-muted' : isOverdue ? 'bg-alert' : 'bg-primary'}"
                          style="width: 8px; height: 8px; display: inline-block;"
-                         title="${isCompleted ? 'Completed' : isOverdue ? 'Overdue' : 'Active'}"></div>
+                         title="${isCompleted ? 'Completed' : isBlocked ? 'Blocked by incomplete dependencies' : isOverdue ? 'Overdue' : 'Active'}"></div>
                 </div>
                 <div class="col-id text-muted text-xs" title="${task.id}">${shortId}</div>
                 <div class="col-desc text-main padding-x-2 flex-grow truncate" title="${task.text}">
                     <span class="priority-icon">${priority?.icon || ''}</span>
                     ${this.escapeHtml(task.text)}
+                    ${isBlocked ? '<span class="badge text-xs text-muted border-thin margin-left-2 font-mono">[BLOCKED]</span>' : ''}
                 </div>
                 <div class="col-cat text-secondary text-xs uppercase" title="${category?.name || task.category}">
                     ${category?.icon || ''} ${task.category}
@@ -152,8 +154,8 @@ export class TaskMatrix {
                 <div class="col-date text-xs">${dueDateDisplay}</div>
                 <div class="col-actions">
                     <div class="row-actions">
-                        <button class="btn-row-action complete" data-action="toggle" title="${isCompleted ? 'Reopen' : 'Complete'}">
-                            ${isCompleted ? '↩' : '✓'}
+                        <button class="btn-row-action complete ${isBlocked ? 'opacity-50' : ''}" data-action="toggle" title="${isCompleted ? 'Reopen' : isBlocked ? 'Blocked by incomplete dependencies' : 'Complete'}">
+                            ${isCompleted ? '↩' : isBlocked ? '🔒' : '✓'}
                         </button>
                         <button class="btn-row-action edit" data-action="edit" title="Edit">
                             ✎
@@ -277,6 +279,7 @@ export class TaskMatrix {
     openCreateModal() {
         const modalLayer = this.container.querySelector('#modal-layer');
         new TaskModal(modalLayer, {
+            allTasks: this.taskStore.getAll(),
             onSave: (taskData) => {
                 try {
                     this.taskStore.create(taskData);
@@ -292,6 +295,7 @@ export class TaskMatrix {
         const modalLayer = this.container.querySelector('#modal-layer');
         new TaskModal(modalLayer, {
             task: task,
+            allTasks: this.taskStore.getAll(),
             onSave: (taskData, isEdit) => {
                 try {
                     if (isEdit) {

@@ -53,6 +53,10 @@ export class Navigation {
                     <span class="icon">🤖</span>
                     <span class="label font-mono uppercase">AI TASK GEN</span>
                 </button>
+                <button class="nav-item flex align-center gap-2 padding-2 border-thin text-left bg-transparent text-secondary transition-all hover-glow" data-id="VOICE">
+                    <span class="icon">🎙️</span>
+                    <span class="label font-mono uppercase">VOICE CAPTURE</span>
+                </button>
 
                 <!-- CATEGORIES SECTION -->
                 <div class="nav-section-label text-muted uppercase margin-top-3 margin-bottom-1">

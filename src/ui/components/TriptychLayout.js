@@ -12,6 +12,8 @@ import { ContextPanel } from './ContextPanel.js';
 import { SystemMenu } from './SystemMenu.js';
 import { AITaskModal } from './AITaskModal.js';
 import { TemplateModal } from './TemplateModal.js';
+import { VoiceCaptureModal } from './VoiceCaptureModal.js';
+import { CommandPaletteModal } from './CommandPaletteModal.js';
 import { CATEGORIES } from '../../config/categories.js';
 
 export class TriptychLayout {
@@ -37,6 +39,7 @@ export class TriptychLayout {
         `;
 
         this.initPanes();
+        this.attachGlobalShortcuts();
     }
 
     initPanes() {
@@ -51,6 +54,57 @@ export class TriptychLayout {
 
         // Initial workspace view
         this.switchWorkspaceView('MATRIX');
+    }
+
+    attachGlobalShortcuts() {
+        document.addEventListener('keydown', this.handleGlobalKeydown = (e) => {
+            const isInput = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
+
+            // Cmd+K or Ctrl+K -> Command Palette
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                this.openCommandPalette();
+                return;
+            }
+
+            // Quick search with '/' key if not inside an input
+            if (!isInput && e.key === '/') {
+                e.preventDefault();
+                this.openCommandPalette();
+                return;
+            }
+
+            // View switching shortcuts (1: Matrix, 2: Kanban, 3: Timeline, 4: Graph) if not in input
+            if (!isInput && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                if (e.key === '1') this.handleNavChange('MATRIX');
+                else if (e.key === '2') this.handleNavChange('KANBAN');
+                else if (e.key === '3') this.handleNavChange('TIMELINE');
+                else if (e.key === '4') this.handleNavChange('GRAPH');
+            }
+        });
+    }
+
+    openCommandPalette() {
+        const modalContainer = this.container.querySelector('#modal-container');
+        new CommandPaletteModal(modalContainer, {
+            taskStore: this.taskStore,
+            onNavChange: (viewId) => {
+                if (viewId === 'TEMPLATES') {
+                    new TemplateModal(modalContainer, { taskStore: this.taskStore });
+                } else if (viewId === 'NEW_TASK') {
+                    if (this.activeViewComponent && typeof this.activeViewComponent.openCreateModal === 'function') {
+                        this.activeViewComponent.openCreateModal();
+                    }
+                } else {
+                    this.handleNavChange(viewId);
+                }
+            },
+            onTaskSelect: (task) => {
+                if (this.contextPanel) {
+                    this.contextPanel.setSelectedTask(task);
+                }
+            }
+        });
     }
 
     handleNavChange(viewId) {
@@ -74,6 +128,14 @@ export class TriptychLayout {
                         });
                     });
                 }
+            });
+            return;
+        }
+
+        if (viewId === 'VOICE') {
+            const modalContainer = this.container.querySelector('#modal-container');
+            new VoiceCaptureModal(modalContainer, {
+                taskStore: this.taskStore
             });
             return;
         }
@@ -131,6 +193,9 @@ export class TriptychLayout {
     }
 
     destroy() {
+        if (this.handleGlobalKeydown) {
+            document.removeEventListener('keydown', this.handleGlobalKeydown);
+        }
         if (this.activeViewComponent && typeof this.activeViewComponent.destroy === 'function') {
             this.activeViewComponent.destroy();
         }
