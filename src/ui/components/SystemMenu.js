@@ -1,3 +1,10 @@
+/**
+ * SystemMenu - System Configuration & Data Backup Utility
+ * Provides Export/Import of Workspace JSON, Markdown Notebook generation, and system settings.
+ */
+
+import { ExportImportEngine } from '../../core/exportImport.js';
+import { taskStore } from '../../core/taskStore.js';
 
 export class SystemMenu {
     constructor(container, onClose) {
@@ -8,46 +15,50 @@ export class SystemMenu {
 
     render() {
         this.container.innerHTML = `
-            <div class="modal-backdrop flex-center full-h full-w" style="position: fixed; top: 0; left: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 100;">
-                <div class="bios-window bg-blue text-inv font-mono padding-4 border-thick border-white" style="width: 600px; background: #0000AA; color: white;">
+            <div class="modal-backdrop flex-center full-h full-w z-50 fixed inset-0 bg-dark-overlay">
+                <div class="bios-window bg-dark text-main font-mono padding-4 border-thick border-primary shadow-glow max-w-600 full-w relative">
+                    <button class="modal-close absolute top-3 right-3 text-muted hover-text-primary text-lg font-mono" id="system-menu-close">✕</button>
+
                     <div class="bios-header text-center margin-bottom-4 border-bottom-thin padding-bottom-2">
-                        <div class="blink">*** SYSTEM CONFIGURATION UTILITY ***</div>
-                        <div class="text-xs margin-top-1">BIOS DATE 10/26/2025 14:22:55 VER 1.0.4</div>
+                        <div class="font-head text-primary text-md uppercase tracking-wider">// SYSTEM_CONFIGURATION_UTILITY</div>
+                        <div class="text-xs text-muted margin-top-1">RELEASE :: RESEARCHFLOW 1.0.0-ALPHA</div>
                     </div>
                     
-                    <div class="bios-content flex gap-4">
-                         <ul class="bios-menu flex-col gap-1 list-none width-30">
-                            <li class="selected bg-white text-blue padding-x-2">> SYSTEM_TIME</li>
-                            <li class="padding-x-2">  BOOT_SEQ</li>
-                            <li class="padding-x-2">  PERIPHERALS</li>
-                            <li class="padding-x-2">  POWER_MGMT</li>
-                            <li class="padding-x-2 text-muted">  EXIT</li>
-                         </ul>
-
-                         <div class="bios-detail width-70 border-left-thin padding-left-4">
+                    <div class="bios-content flex-col gap-4">
+                        <!-- DATA BACKUP & RESTORE -->
+                        <div class="menu-section bg-dim border-thin padding-3">
+                            <div class="font-head text-secondary text-xs uppercase margin-bottom-2">// DATA_BACKUP_AND_PORTABILITY</div>
                             <div class="flex-col gap-2">
-                                <label class="flex-between">
-                                    <span>SYSTEM_THEME</span>
-                                    <span class="text-yellow">[ CYBER_DARK ]</span>
-                                </label>
-                                <label class="flex-between">
-                                    <span>DATA_SYNC</span>
-                                    <span class="text-yellow">[ ENABLED ]</span>
-                                </label>
-                                <label class="flex-between">
-                                    <span>CACHE_CLEAR</span>
-                                    <span class="text-yellow">[ PRESS_ENTER ]</span>
-                                </label>
+                                <div class="flex-between align-center">
+                                    <span class="text-xs text-muted">Export workspace data (JSON backup)</span>
+                                    <button id="btn-export-json" class="btn-tactical text-xs padding-x-2 padding-y-1 text-primary border-thin">[EXPORT JSON]</button>
+                                </div>
+                                <div class="flex-between align-center">
+                                    <span class="text-xs text-muted">Export Research Summary (Markdown)</span>
+                                    <button id="btn-export-md" class="btn-tactical text-xs padding-x-2 padding-y-1 text-secondary border-thin">[EXPORT NOTEBOOK]</button>
+                                </div>
+                                <div class="flex-between align-center margin-top-2 border-top-thin padding-top-2">
+                                    <span class="text-xs text-muted">Import workspace data (JSON file)</span>
+                                    <label class="btn-tactical text-xs padding-x-2 padding-y-1 text-success border-thin cursor-pointer">
+                                        [IMPORT JSON]
+                                        <input type="file" id="file-import-json" accept=".json" class="display-none">
+                                    </label>
+                                </div>
                             </div>
-                            
-                            <div class="bios-help margin-top-6 text-xs text-muted border-top-thin padding-top-2">
-                                F1: Help  ESC: Exit  ARROWS: Select
+                        </div>
+
+                        <!-- SYSTEM STORAGE CONTROL -->
+                        <div class="menu-section bg-dim border-thin padding-3">
+                            <div class="font-head text-alert text-xs uppercase margin-bottom-2">// STORAGE_MANAGEMENT</div>
+                            <div class="flex-between align-center">
+                                <span class="text-xs text-muted">Purge local workspace state & reset</span>
+                                <button id="btn-reset-storage" class="btn-tactical text-xs padding-x-2 padding-y-1 text-alert border-thin">[PURGE ALL DATA]</button>
                             </div>
-                         </div>
+                        </div>
                     </div>
 
-                    <div class="bios-footer text-center margin-top-4 padding-top-2 border-top-thin">
-                        (C) 2025 RESEARCH_FLOW INC.
+                    <div class="bios-footer text-center margin-top-4 padding-top-2 border-top-thin text-xs text-muted">
+                        RESEARCHFLOW // NEOMODERN CYBERPUNK ARCHITECTURE
                     </div>
                 </div>
             </div>
@@ -57,29 +68,60 @@ export class SystemMenu {
     }
 
     attachEvents() {
-        // Close on backdrop click or ESC
-        this.container.querySelector('.modal-backdrop').addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) {
+        const backdrop = this.container.querySelector('.modal-backdrop');
+        const closeBtn = this.container.querySelector('#system-menu-close');
+        const exportJsonBtn = this.container.querySelector('#btn-export-json');
+        const exportMdBtn = this.container.querySelector('#btn-export-md');
+        const importFileInput = this.container.querySelector('#file-import-json');
+        const resetStorageBtn = this.container.querySelector('#btn-reset-storage');
+
+        closeBtn.addEventListener('click', () => this.close());
+        backdrop.addEventListener('click', (e) => {
+            if (e.target === backdrop) this.close();
+        });
+
+        exportJsonBtn.addEventListener('click', () => {
+            ExportImportEngine.downloadWorkspaceJSON();
+        });
+
+        exportMdBtn.addEventListener('click', () => {
+            ExportImportEngine.downloadNotebookMarkdown();
+        });
+
+        importFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                const res = ExportImportEngine.importWorkspaceJSON(evt.target.result, false);
+                if (res.success) {
+                    alert(`SUCCESS: Imported ${res.count} research protocols into workspace.`);
+                    this.close();
+                } else {
+                    alert(`IMPORT ERROR: ${res.error}`);
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        resetStorageBtn.addEventListener('click', () => {
+            const confirmed = confirm('CRITICAL WARNING:\n\nThis will purge all tasks and reset ResearchFlow to empty state.\nAre you sure?');
+            if (confirmed) {
+                const current = taskStore.getAll();
+                current.forEach(t => taskStore.delete(t.id));
+                alert('Storage purged successfully.');
                 this.close();
             }
         });
 
-        const exitItem = this.container.querySelectorAll('li')[4]; // Quick hack for 'EXIT'
-        if (exitItem) {
-            exitItem.addEventListener('click', () => this.close());
-        }
-
-        document.addEventListener('keydown', this.handleKey.bind(this));
-    }
-
-    handleKey(e) {
-        if (e.key === 'Escape') {
-            this.close();
-        }
+        document.addEventListener('keydown', this.handleKey = (e) => {
+            if (e.key === 'Escape') this.close();
+        });
     }
 
     close() {
-        document.removeEventListener('keydown', this.handleKey.bind(this));
+        document.removeEventListener('keydown', this.handleKey);
         this.container.innerHTML = '';
         this.onClose();
     }

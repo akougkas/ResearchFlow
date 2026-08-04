@@ -5,6 +5,8 @@
 
 import { QueryBuilder } from './QueryBuilder.js';
 import { TaskModal } from './TaskModal.js';
+import { TemplateModal } from './TemplateModal.js';
+import { AITaskModal } from './AITaskModal.js';
 import { getCategoryById } from '../../config/categories.js';
 import { getPriorityByLevel } from '../../config/priorities.js';
 
@@ -56,6 +58,12 @@ export class TaskMatrix {
                         </div>
                     </div>
                     <div class="matrix-actions flex gap-2">
+                        <button id="ai-gen-btn" class="btn-tactical text-secondary border-thin padding-2 font-mono uppercase">
+                            [🤖 AI GEN]
+                        </button>
+                        <button id="template-btn" class="btn-tactical text-main border-thin padding-2 font-mono uppercase">
+                            [📚 TEMPLATES]
+                        </button>
                         <button id="add-task-btn" class="btn-tactical text-primary border-thin padding-2 font-mono uppercase">
                             [+ INIT_TASK]
                         </button>
@@ -164,7 +172,7 @@ export class TaskMatrix {
             <div class="empty-state padding-5 text-center">
                 <div class="font-head text-primary text-lg margin-bottom-2">// NO_DATA_FOUND</div>
                 <div class="font-mono text-muted text-sm margin-bottom-4">
-                    Initialize a new research protocol to begin tracking.
+                    Initialize a new research protocol or deploy a template to begin tracking.
                 </div>
                 <button id="empty-add-btn" class="btn-tactical text-primary border-thin padding-2 font-mono uppercase">
                     [+ INIT_FIRST_PROTOCOL]
@@ -176,17 +184,39 @@ export class TaskMatrix {
     attachEvents() {
         const addBtn = this.container.querySelector('#add-task-btn');
         const emptyAddBtn = this.container.querySelector('#empty-add-btn');
+        const aiBtn = this.container.querySelector('#ai-gen-btn');
+        const templateBtn = this.container.querySelector('#template-btn');
         const taskList = this.container.querySelector('#task-list');
 
-        // Add task button
-        if (addBtn) {
-            addBtn.addEventListener('click', () => this.openCreateModal());
-        }
-        if (emptyAddBtn) {
-            emptyAddBtn.addEventListener('click', () => this.openCreateModal());
+        if (addBtn) addBtn.addEventListener('click', () => this.openCreateModal());
+        if (emptyAddBtn) emptyAddBtn.addEventListener('click', () => this.openCreateModal());
+
+        if (aiBtn) {
+            aiBtn.addEventListener('click', () => {
+                const modalLayer = this.container.querySelector('#modal-layer');
+                new AITaskModal(modalLayer, {
+                    onConfirm: (tasks) => {
+                        tasks.forEach(t => {
+                            this.taskStore.create({
+                                text: t.text,
+                                category: t.category,
+                                priority: t.priority,
+                                notes: t.notes || '',
+                                dueDate: t.offsetDays ? new Date(Date.now() + t.offsetDays * 86400000).toISOString().split('T')[0] : null
+                            });
+                        });
+                    }
+                });
+            });
         }
 
-        // Event delegation for task list
+        if (templateBtn) {
+            templateBtn.addEventListener('click', () => {
+                const modalLayer = this.container.querySelector('#modal-layer');
+                new TemplateModal(modalLayer, { taskStore: this.taskStore });
+            });
+        }
+
         if (taskList) {
             taskList.addEventListener('click', (e) => {
                 const row = e.target.closest('.matrix-row.item');
@@ -199,15 +229,12 @@ export class TaskMatrix {
                     const action = actionBtn.dataset.action;
                     this.handleRowAction(action, taskId);
                 } else {
-                    // Row click = select
                     this.selectTask(taskId);
                 }
             });
         }
 
-        // Keyboard shortcuts
         document.addEventListener('keydown', this.handleKeyboard = (e) => {
-            // Ctrl/Cmd + N = New task
             if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
                 e.preventDefault();
                 this.openCreateModal();
@@ -227,9 +254,7 @@ export class TaskMatrix {
 
             case 'edit':
                 const task = this.taskStore.getById(taskId);
-                if (task) {
-                    this.openEditModal(task);
-                }
+                if (task) this.openEditModal(task);
                 break;
 
             case 'delete':
@@ -242,12 +267,10 @@ export class TaskMatrix {
         this.selectedTaskId = taskId;
         const task = this.taskStore.getById(taskId);
 
-        // Update visual selection
         this.container.querySelectorAll('.matrix-row.item').forEach(row => {
             row.classList.toggle('selected', row.dataset.id === taskId);
         });
 
-        // Notify parent (TriptychLayout/ContextPanel)
         this.onTaskSelect(task);
     }
 
@@ -286,10 +309,7 @@ export class TaskMatrix {
         const task = this.taskStore.getById(taskId);
         if (!task) return;
 
-        const confirmed = confirm(
-            `DELETE PROTOCOL?\n\n"${task.text.slice(0, 50)}${task.text.length > 50 ? '...' : ''}"\n\nThis action cannot be undone.`
-        );
-
+        const confirmed = confirm(`DELETE PROTOCOL?\n\n"${task.text.slice(0, 50)}..."\n\nThis action cannot be undone.`);
         if (confirmed) {
             try {
                 this.taskStore.delete(taskId);
@@ -299,7 +319,6 @@ export class TaskMatrix {
                 }
             } catch (err) {
                 console.error('Delete failed:', err);
-                alert('Failed to delete task: ' + err.message);
             }
         }
     }

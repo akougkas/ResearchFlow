@@ -73,11 +73,13 @@
     cursor: pointer;
 }
 
-/* --- BUTTONS --- */
+/* --- BUTTONS & TACTICAL STYLES --- */
 .btn-tactical {
     background: transparent;
     cursor: pointer;
     transition: all 0.2s;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
 }
 
 .btn-tactical:hover {
@@ -99,6 +101,14 @@
 
 .hover-inv:hover {
     filter: invert(1);
+}
+
+.hover-glow:hover {
+    box-shadow: 0 0 12px var(--color-primary);
+}
+
+.cursor-pointer {
+    cursor: pointer;
 }
 
 /* --- CONTEXT PANEL --- */
@@ -125,7 +135,7 @@
     background: linear-gradient(45deg, transparent 50%, var(--border-color) 50%);
 }
 
-/* --- MODAL --- */
+/* --- MODALS & OVERLAYS --- */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -139,6 +149,15 @@
     z-index: 1000;
     backdrop-filter: blur(4px);
     animation: fadeIn 0.15s ease;
+}
+
+.bg-dark-overlay {
+    background: rgba(5, 7, 10, 0.88) !important;
+    backdrop-filter: blur(6px);
+}
+
+.shadow-glow {
+    box-shadow: 0 0 30px rgba(243, 249, 26, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.8);
 }
 
 @keyframes fadeIn {
@@ -187,7 +206,7 @@
 }
 
 /* --- FORM INPUTS --- */
-.input-field {
+.input-field, .input-tactical {
     background: var(--bg-void);
     border: var(--border-width) solid var(--border-color);
     color: var(--text-main);
@@ -197,13 +216,13 @@
     transition: all 0.2s;
 }
 
-.input-field:focus {
+.input-field:focus, .input-tactical:focus {
     outline: none;
     border-color: var(--color-primary);
     box-shadow: 0 0 10px var(--color-primary-dim);
 }
 
-.input-field::placeholder {
+.input-field::placeholder, .input-tactical::placeholder {
     color: var(--text-muted);
 }
 
@@ -327,34 +346,18 @@ textarea.input-field {
     box-shadow: 0 0 10px var(--color-primary-dim);
 }
 
-/* --- CONFIRMATION DIALOG --- */
-.confirm-dialog {
-    background: var(--bg-panel);
-    border: 2px solid var(--color-alert);
-    padding: var(--space-4);
-    text-align: center;
-}
-
-.confirm-dialog .confirm-message {
-    margin-bottom: var(--space-3);
-}
-
-.confirm-dialog .confirm-actions {
-    display: flex;
-    gap: var(--space-2);
-    justify-content: center;
-}
-
 /* --- UTILITY ADDITIONS --- */
-.block {
-    display: block;
-}
-
-.hidden {
-    display: none !important;
-}
-
-.grid-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-}
+.block { display: block; }
+.hidden, .display-none { display: none !important; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; }
+.strike { text-decoration: line-through; }
+.inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+.fixed { position: fixed; }
+.z-50 { z-index: 50; }
+.max-w-600 { max-width: 600px; }
+.max-w-650 { max-width: 650px; }
+.max-h-200 { max-height: 200px; }
+.min-w-300 { min-width: 300px; }
+.overflow-hidden { overflow: hidden; }
+.pointer-events-none { pointer-events: none; }
+.pointer-events-auto { pointer-events: auto; }

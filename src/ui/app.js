@@ -1,17 +1,28 @@
 import { taskStore } from '../core/taskStore.js';
 import { LandingPage } from './components/LandingPage.js';
-// Import template registry to register built-in templates
+import { TriptychLayout } from './components/TriptychLayout.js';
 import '../features/templates/index.js';
 
 class App {
     constructor() {
         this.appContainer = document.getElementById('app');
-        this.state = 'LANDING'; // LANDING | DASHBOARD
+        this.state = 'DASHBOARD'; // Default to DASHBOARD for instant access
         this.init();
     }
 
     init() {
+        this.registerServiceWorker();
         this.render();
+    }
+
+    registerServiceWorker() {
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/public/sw.js')
+                    .then(reg => console.log('ResearchFlow SW registered:', reg.scope))
+                    .catch(err => console.log('SW registration failed:', err));
+            });
+        }
     }
 
     render() {
@@ -23,32 +34,8 @@ class App {
                 this.render();
             });
         } else if (this.state === 'DASHBOARD') {
-            this.renderDashboard();
+            new TriptychLayout(this.appContainer, taskStore);
         }
-    }
-
-    renderDashboard() {
-        // Placeholder for Triptych Layout
-        // new TriptychLayout(this.appContainer, taskStore);
-        this.appContainer.innerHTML = `
-            <div class="dashboard-loading flex-center full-h full-w font-head text-lg text-primary blink">
-                // LOADING MODULES...
-            </div>
-        `;
-
-        // Simulate load for effect
-        setTimeout(() => {
-            import('./components/TriptychLayout.js')
-                .then(module => {
-                    const TriptychLayout = module.TriptychLayout;
-                    this.appContainer.innerHTML = ''; // Clear loader
-                    new TriptychLayout(this.appContainer, taskStore);
-                })
-                .catch(err => {
-                    console.error("Failed to load dashboard", err);
-                    this.appContainer.innerHTML = `<div class="text-alert">CRITICAL ERROR: MODULE FAIL</div>`;
-                });
-        }, 800);
     }
 }
 

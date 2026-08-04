@@ -1,3 +1,7 @@
+/**
+ * Navigation - Left Navigation Rail Component
+ * Switches views (Matrix, Kanban, Timeline, Graph), filters by category, and triggers system/AI modals.
+ */
 
 import { CATEGORIES } from '../../config/categories.js';
 
@@ -5,42 +9,78 @@ export class Navigation {
     constructor(container, onNavChange) {
         this.container = container;
         this.onNavChange = onNavChange;
+        this.activeId = 'MATRIX';
         this.render();
     }
 
     render() {
         this.container.innerHTML = `
-            <div class="nav-header padding-3 border-bottom-thick">
-                <div class="text-primary font-head text-lg tracking-wider">R_FLOW</div>
-                <div class="text-muted font-mono text-sm margin-top-1">V2.0.4</div>
+            <div class="nav-header padding-3 border-bottom-thick border-primary flex-col">
+                <div class="flex-between align-center">
+                    <div class="text-primary font-head text-lg tracking-wider">R_FLOW</div>
+                    <span class="badge border-thin text-xs text-success font-mono">ALPHA</span>
+                </div>
+                <div class="text-muted font-mono text-xs margin-top-1">RESEARCHFLOW V1.0</div>
             </div>
 
-            <div class="nav-links flex-col gap-2 padding-3 scroll-y flex-grow">
-                <div class="nav-section-label text-muted font-mono text-xs uppercase margin-bottom-2">
+            <div class="nav-links flex-col gap-2 padding-3 scroll-y flex-grow font-mono text-xs">
+                <!-- VIEWS SECTION -->
+                <div class="nav-section-label text-muted uppercase margin-bottom-1">
+                    // WORKSPACE_VIEWS
+                </div>
+                <button class="nav-item flex align-center gap-2 padding-2 border-thin text-left bg-transparent text-main transition-all ${this.activeId === 'MATRIX' ? 'nav-active' : ''}" data-id="MATRIX">
+                    <span class="icon text-primary">▦</span>
+                    <span class="label font-mono uppercase">MATRIX GRID</span>
+                </button>
+                <button class="nav-item flex align-center gap-2 padding-2 border-thin text-left bg-transparent text-main transition-all ${this.activeId === 'KANBAN' ? 'nav-active' : ''}" data-id="KANBAN">
+                    <span class="icon text-primary">📋</span>
+                    <span class="label font-mono uppercase">KANBAN BOARD</span>
+                </button>
+                <button class="nav-item flex align-center gap-2 padding-2 border-thin text-left bg-transparent text-main transition-all ${this.activeId === 'TIMELINE' ? 'nav-active' : ''}" data-id="TIMELINE">
+                    <span class="icon text-primary">⏱</span>
+                    <span class="label font-mono uppercase">TIMELINE</span>
+                </button>
+                <button class="nav-item flex align-center gap-2 padding-2 border-thin text-left bg-transparent text-main transition-all ${this.activeId === 'GRAPH' ? 'nav-active' : ''}" data-id="GRAPH">
+                    <span class="icon text-secondary">🕸</span>
+                    <span class="label font-mono uppercase">FORCE GRAPH</span>
+                </button>
+
+                <!-- AI TOOLS SECTION -->
+                <div class="nav-section-label text-muted uppercase margin-top-3 margin-bottom-1">
+                    // INTELLIGENCE
+                </div>
+                <button class="nav-item flex align-center gap-2 padding-2 border-thin text-left bg-transparent text-primary transition-all hover-glow" data-id="AI_GEN">
+                    <span class="icon">🤖</span>
+                    <span class="label font-mono uppercase">AI TASK GEN</span>
+                </button>
+
+                <!-- CATEGORIES SECTION -->
+                <div class="nav-section-label text-muted uppercase margin-top-3 margin-bottom-1">
                     // DATA_BANKS
                 </div>
-                ${CATEGORIES.map(cat => this.createNavLink(cat)).join('')}
+                ${CATEGORIES.map(cat => this.createCategoryLink(cat)).join('')}
                 
-                <div class="nav-section-label text-muted font-mono text-xs uppercase margin-top-4 margin-bottom-2">
+                <!-- SYSTEM SECTION -->
+                <div class="nav-section-label text-muted uppercase margin-top-3 margin-bottom-1">
                     // SYSTEM
                 </div>
                 <button class="nav-item flex align-center gap-2 padding-2 border-thin text-left bg-transparent text-main transition-all" data-id="SETTINGS">
                     <span class="icon">⚙</span>
-                    <span class="label font-mono">SETTINGS</span>
+                    <span class="label font-mono uppercase">SETTINGS / EXPORT</span>
                 </button>
             </div>
             
             <div class="nav-footer padding-3 border-top-thin text-center text-muted font-mono text-xs">
-                SECURE_CONN
+                LOCAL_STORAGE // ENCRYPTED
             </div>
         `;
 
         this.attachEvents();
     }
 
-    createNavLink(category) {
+    createCategoryLink(category) {
         return `
-            <button class="nav-item flex align-center gap-2 padding-2 border-thin text-left bg-transparent text-main transition-all" data-id="${category.id}">
+            <button class="nav-item flex align-center gap-2 padding-2 border-thin text-left bg-transparent text-main transition-all ${this.activeId === category.id ? 'nav-active' : ''}" data-id="${category.id}">
                 <span class="icon text-secondary">[${category.icon}]</span>
                 <span class="label font-mono uppercase">${category.name}</span>
             </button>
@@ -49,20 +89,17 @@ export class Navigation {
 
     attachEvents() {
         this.container.querySelectorAll('.nav-item').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', () => {
                 const id = btn.dataset.id;
-                if (id) this.onNavChange(id);
+                if (!id) return;
 
-                // Active state logic
-                this.container.querySelectorAll('.nav-item').forEach(b => {
-                    b.classList.remove('nav-active');
-                    b.style.background = 'transparent';
-                    b.style.color = 'var(--text-main)';
-                });
-                btn.classList.add('nav-active');
-                btn.style.background = 'var(--category-color, rgba(243, 249, 26, 0.1))';
-                btn.style.color = 'var(--color-primary)';
-                btn.style.borderColor = 'var(--color-primary)';
+                if (!['SETTINGS', 'AI_GEN'].includes(id)) {
+                    this.activeId = id;
+                    this.container.querySelectorAll('.nav-item').forEach(b => b.classList.remove('nav-active'));
+                    btn.classList.add('nav-active');
+                }
+
+                this.onNavChange(id);
             });
         });
     }
