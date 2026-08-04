@@ -49,3 +49,26 @@
     --scanline-color: rgba(255, 255, 255, 0.02);
     --glitch-offset: 2px;
 }
+
+/* THEME OVERRIDES */
+[data-theme="matrix"] {
+    --color-primary: #39FF14;
+    --color-primary-dim: #39FF1480;
+    --color-secondary: #00FF66;
+    --border-active: #39FF14;
+}
+
+[data-theme="cyan"] {
+    --color-primary: #00F0FF;
+    --color-primary-dim: #00F0FF80;
+    --color-secondary: #FF007F;
+    --border-active: #00F0FF;
+}
+
+[data-theme="synthwave"] {
+    --color-primary: #BF5AF2;
+    --color-primary-dim: #BF5AF280;
+    --color-secondary: #F3F91A;
+    --border-active: #BF5AF2;
+}
+

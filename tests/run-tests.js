@@ -110,6 +110,13 @@ async function runTests() {
     const dependentsOfRoot = taskStore.getDependentTasks(uncompletedA.id);
     assert(dependentsOfRoot.length === 2, 'Identifies root protocol blocking multiple dependent tasks');
 
+    // TEST 7: Cyberpunk Theme Engine
+    console.log('\n--- TEST GROUP 7: Cyberpunk Theme Engine ---');
+    const { themeManager, THEMES } = await import('../src/core/themeManager.js');
+    assert(THEMES.length === 4, 'Provides 4 curated Cyberpunk themes');
+    themeManager.setTheme('matrix');
+    assert(themeManager.getTheme() === 'matrix', 'Theme switch persists and updates active theme');
+
     // SUMMARY
     console.log('\n========================================');
     console.log(`📊 TEST RESULTS: ${passed} PASSED, ${failed} FAILED`);

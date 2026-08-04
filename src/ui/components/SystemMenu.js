@@ -5,6 +5,7 @@
 
 import { ExportImportEngine } from '../../core/exportImport.js';
 import { taskStore } from '../../core/taskStore.js';
+import { themeManager, THEMES } from '../../core/themeManager.js';
 
 export class SystemMenu {
     constructor(container, onClose) {
@@ -14,6 +15,8 @@ export class SystemMenu {
     }
 
     render() {
+        const currentTheme = themeManager.getTheme();
+
         this.container.innerHTML = `
             <div class="modal-backdrop flex-center full-h full-w z-50 fixed inset-0 bg-dark-overlay">
                 <div class="bios-window bg-dark text-main font-mono padding-4 border-thick border-primary shadow-glow max-w-600 full-w relative">
@@ -21,10 +24,23 @@ export class SystemMenu {
 
                     <div class="bios-header text-center margin-bottom-4 border-bottom-thin padding-bottom-2">
                         <div class="font-head text-primary text-md uppercase tracking-wider">// SYSTEM_CONFIGURATION_UTILITY</div>
-                        <div class="text-xs text-muted margin-top-1">RELEASE :: RESEARCHFLOW 1.0.0-ALPHA</div>
+                        <div class="text-xs text-muted margin-top-1">RELEASE :: RESEARCHFLOW V1.0-BETA</div>
                     </div>
                     
                     <div class="bios-content flex-col gap-4">
+                        <!-- THEME SELECTOR -->
+                        <div class="menu-section bg-dim border-thin padding-3">
+                            <div class="font-head text-primary text-xs uppercase margin-bottom-2">// CYBERPUNK_THEME_ENGINE</div>
+                            <div class="grid-2 gap-2">
+                                ${THEMES.map(theme => `
+                                    <button class="btn-tactical text-xs padding-2 border-thin text-left flex-between btn-theme-select ${theme.id === currentTheme ? 'text-primary border-primary font-bold' : 'text-main'}" data-theme="${theme.id}">
+                                        <span>${theme.name}</span>
+                                        <span style="color: ${theme.primary};">■</span>
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+
                         <!-- DATA BACKUP & RESTORE -->
                         <div class="menu-section bg-dim border-thin padding-3">
                             <div class="font-head text-secondary text-xs uppercase margin-bottom-2">// DATA_BACKUP_AND_PORTABILITY</div>
@@ -78,6 +94,15 @@ export class SystemMenu {
         closeBtn.addEventListener('click', () => this.close());
         backdrop.addEventListener('click', (e) => {
             if (e.target === backdrop) this.close();
+        });
+
+        // Theme selection
+        this.container.querySelectorAll('.btn-theme-select').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const themeId = btn.dataset.theme;
+                themeManager.setTheme(themeId);
+                this.render();
+            });
         });
 
         exportJsonBtn.addEventListener('click', () => {
