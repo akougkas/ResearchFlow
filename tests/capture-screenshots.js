@@ -8,9 +8,12 @@ const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:8000/?demo=1';
 await mkdir(output, { recursive: true });
 
 const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage({ viewport: { width: 1440, height: 960 }, deviceScaleFactor: 1 });
+const page = await browser.newPage({
+    viewport: { width: 1440, height: 960 },
+    deviceScaleFactor: 1,
+});
 const errors = [];
-page.on('pageerror', error => errors.push(error.message));
+page.on('pageerror', (error) => errors.push(error.message));
 
 try {
     await page.goto(baseUrl, { waitUntil: 'networkidle' });
@@ -40,6 +43,37 @@ try {
     await page.getByRole('button', { name: 'Add task' }).click();
     await page.getByRole('heading', { name: 'Add research work' }).waitFor();
     await page.screenshot({ path: path.join(output, '06-capture.png'), fullPage: true });
+    await page
+        .getByPlaceholder('e.g. Validate benchmark results')
+        .fill('Reproduce scaling result on Ares');
+    await page.getByRole('button', { name: 'Add to workspace' }).click();
+    await page.getByText('Reproduce scaling result on Ares').waitFor();
+    await page.getByText('Reproduce scaling result on Ares').click();
+    await page.getByRole('button', { name: 'Edit' }).click();
+    await page.locator('input[name="text"]').fill('Reproduce scaling result on Ares cluster');
+    await page.getByRole('button', { name: 'Save changes' }).click();
+    const editedTask = page.getByRole('main').getByText('Reproduce scaling result on Ares cluster');
+    await editedTask.waitFor();
+
+    const downloadPromise = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Export backup' }).click();
+    const download = await downloadPromise;
+    if (!download.suggestedFilename().endsWith('.json')) {
+        throw new Error('Backup export was not JSON');
+    }
+
+    await editedTask.click();
+    page.once('dialog', (dialog) => dialog.accept());
+    await page.getByRole('button', { name: 'Delete' }).click();
+    await editedTask.waitFor({ state: 'detached' });
+
+    const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    mobile.on('pageerror', (error) => errors.push(error.message));
+    await mobile.goto(baseUrl, { waitUntil: 'networkidle' });
+    await mobile.locator('.mobile-menu').click();
+    await mobile.locator('.sidebar').waitFor();
+    await mobile.screenshot({ path: path.join(output, '07-mobile.png'), fullPage: true });
+    await mobile.close();
 
     if (errors.length) throw new Error(`Browser errors: ${errors.join('; ')}`);
     console.log('✅ Gnosis Tasks browser journey passed with zero page errors');

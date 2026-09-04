@@ -1,0 +1,12 @@
+{
+    "singleQuote": true,
+    "trailingComma": "all",
+    "printWidth": 100,
+    "tabWidth": 4,
+    "overrides": [
+        {
+            "files": "*.css",
+            "options": { "tabWidth": 2 }
+        }
+    ]
+}

@@ -12,10 +12,10 @@ export class Task {
         tags = [],
         notes = '',
         dependencies = [], // task IDs this task depends on
-        links = [],        // outward links to other tasks/nodes [[Task:id]]
-        backlinks = [],    // inward links from other tasks/nodes
+        links = [], // outward links to other tasks/nodes [[Task:id]]
+        backlinks = [], // inward links from other tasks/nodes
         projectId = null,
-        position = { x: Math.random() * 800, y: Math.random() * 600 } // For graph view
+        position = { x: Math.random() * 800, y: Math.random() * 600 }, // For graph view
     } = {}) {
         this.id = id || this.generateId();
         this.text = text;
@@ -76,7 +76,7 @@ export class Project {
         name = '',
         description = '',
         color = '#3b82f6',
-        createdAt = Date.now()
+        createdAt = Date.now(),
     } = {}) {
         this.id = id || this.generateId();
         this.name = name;
@@ -97,4 +97,3 @@ export class Project {
         return new Project(json);
     }
 }
-

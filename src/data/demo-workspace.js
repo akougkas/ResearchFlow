@@ -14,7 +14,7 @@ export function createDemoWorkspace() {
             completed: true,
             dueDate: dateFromToday(-10),
             tags: ['transcriptomics', 'review'],
-            notes: 'Summarize benchmark datasets and unresolved normalization questions.'
+            notes: 'Summarize benchmark datasets and unresolved normalization questions.',
         },
         {
             id: 'task_demo_hypothesis',
@@ -25,7 +25,7 @@ export function createDemoWorkspace() {
             dueDate: dateFromToday(-5),
             dependencies: ['task_demo_literature'],
             tags: ['preregistration', 'hypoxia'],
-            notes: 'Derived from [[Task:task_demo_literature]]. Primary endpoint: HIF1A neighborhood enrichment.'
+            notes: 'Derived from [[Task:task_demo_literature]]. Primary endpoint: HIF1A neighborhood enrichment.',
         },
         {
             id: 'task_demo_samples',
@@ -37,7 +37,7 @@ export function createDemoWorkspace() {
             dueDate: dateFromToday(2),
             dependencies: ['task_demo_hypothesis'],
             tags: ['wet-lab', 'pilot'],
-            notes: 'Six control and six hypoxia-treated sections. Record RIN and imaging QC.'
+            notes: 'Six control and six hypoxia-treated sections. Record RIN and imaging QC.',
         },
         {
             id: 'task_demo_pipeline',
@@ -49,7 +49,7 @@ export function createDemoWorkspace() {
             dueDate: dateFromToday(4),
             dependencies: ['task_demo_literature'],
             tags: ['python', 'quality-control'],
-            notes: 'Compare filtering thresholds before processing the pilot tissue sections.'
+            notes: 'Compare filtering thresholds before processing the pilot tissue sections.',
         },
         {
             id: 'task_demo_analysis',
@@ -60,7 +60,7 @@ export function createDemoWorkspace() {
             dueDate: dateFromToday(8),
             dependencies: ['task_demo_samples', 'task_demo_pipeline'],
             tags: ['statistics', 'pathways'],
-            notes: 'Blocked until the pilot data and validated pipeline are available.'
+            notes: 'Blocked until the pilot data and validated pipeline are available.',
         },
         {
             id: 'task_demo_figures',
@@ -71,7 +71,7 @@ export function createDemoWorkspace() {
             dueDate: dateFromToday(12),
             dependencies: ['task_demo_analysis'],
             tags: ['figures', 'lab-meeting'],
-            notes: 'Include sample QC, spatial clusters, effect sizes, and sensitivity analysis.'
+            notes: 'Include sample QC, spatial clusters, effect sizes, and sensitivity analysis.',
         },
         {
             id: 'task_demo_methods',
@@ -83,7 +83,7 @@ export function createDemoWorkspace() {
             dueDate: dateFromToday(14),
             dependencies: ['task_demo_pipeline'],
             tags: ['manuscript', 'reproducibility'],
-            notes: 'Document environment, parameters, exclusions, and data provenance.'
+            notes: 'Document environment, parameters, exclusions, and data provenance.',
         },
         {
             id: 'task_demo_manuscript',
@@ -94,7 +94,7 @@ export function createDemoWorkspace() {
             dueDate: dateFromToday(21),
             dependencies: ['task_demo_figures', 'task_demo_methods'],
             tags: ['manuscript', 'collaboration'],
-            notes: 'Integrate the reproducible figures and finalized methods into one narrative.'
+            notes: 'Integrate the reproducible figures and finalized methods into one narrative.',
         },
         {
             id: 'task_demo_budget',
@@ -104,7 +104,7 @@ export function createDemoWorkspace() {
             completed: false,
             dueDate: dateFromToday(6),
             tags: ['budget', 'grant'],
-            notes: 'Request updated core-facility quote and include long-term archive costs.'
+            notes: 'Request updated core-facility quote and include long-term archive costs.',
         },
         {
             id: 'task_demo_grant',
@@ -115,7 +115,7 @@ export function createDemoWorkspace() {
             dueDate: dateFromToday(30),
             dependencies: ['task_demo_analysis', 'task_demo_budget'],
             tags: ['grant', 'deadline'],
-            notes: 'Use preliminary results and the validated analysis plan as feasibility evidence.'
+            notes: 'Use preliminary results and the validated analysis plan as feasibility evidence.',
         },
         {
             id: 'task_demo_overdue',
@@ -125,8 +125,8 @@ export function createDemoWorkspace() {
             completed: false,
             dueDate: dateFromToday(-2),
             tags: ['documentation', 'overdue'],
-            notes: 'Intentionally overdue demo item for analytics and timeline views.'
-        }
+            notes: 'Intentionally overdue demo item for analytics and timeline views.',
+        },
     ];
 }
 

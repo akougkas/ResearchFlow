@@ -1,177 +1,80 @@
-import { db } from '../data/Database.js';
+const STORAGE_KEYS = Object.freeze({
+    tasks: 'gnosis.tasks.v1',
+    settings: 'gnosis.settings.v1',
+    projects: 'gnosis.projects.v1',
+});
 
-// Versioned storage keys for safe data migration
-const STORAGE_KEYS = {
-  tasks: 'rf.tasks.v1',
-  settings: 'rf.settings.v1',
-  projects: 'rf.projects.v1'
-};
+const LEGACY_KEYS = Object.freeze({
+    tasks: 'rf.tasks.v1',
+    settings: 'rf.settings.v1',
+    projects: 'rf.projects.v1',
+});
 
 class StorageManager {
-  constructor() {
-    this.keys = STORAGE_KEYS;
-    this.version = 1;
-    this.initDatabase();
-  }
-
-  async initDatabase() {
-    try {
-      if (typeof window !== 'undefined' && 'indexedDB' in window) {
-        await db.open();
-      }
-    } catch (err) {
-      console.warn('IndexedDB initialization deferred or unavailable:', err);
+    constructor(storage = globalThis.localStorage) {
+        this.storage = storage;
+        this.version = 1;
     }
-  }
 
-  // Save data to a specific versioned key and sync to IndexedDB
-  save(key, data) {
-    try {
-      const storageKey = this.keys[key];
-      if (!storageKey) {
-        throw new Error(`Unknown storage key: ${key}`);
-      }
+    resolveKey(name) {
+        const key = STORAGE_KEYS[name];
+        if (!key) throw new Error(`Unknown storage collection: ${name}`);
+        return key;
+    }
 
-      const payload = {
-        version: this.version,
-        timestamp: Date.now(),
-        data: data
-      };
-      
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(storageKey, JSON.stringify(payload));
-      }
-
-      // Async backup sync to IndexedDB if open
-      if (db && db.isOpen) {
-        if (key === 'tasks' && Array.isArray(data)) {
-          Promise.all(data.map(t => db.tasks.put(t))).catch(err => console.warn('IndexedDB task sync error:', err));
-        } else if (key === 'projects' && Array.isArray(data)) {
-          Promise.all(data.map(p => db.projects.put(p))).catch(err => console.warn('IndexedDB project sync error:', err));
+    save(name, data) {
+        if (!this.storage) return false;
+        try {
+            this.storage.setItem(
+                this.resolveKey(name),
+                JSON.stringify({ version: this.version, savedAt: new Date().toISOString(), data }),
+            );
+            return true;
+        } catch (error) {
+            console.error('Unable to save workspace:', error);
+            return false;
         }
-      }
-
-      return true;
-    } catch (error) {
-      if (error.name === 'QuotaExceededError') {
-        console.error('Storage quota exceeded');
-        this.handleQuotaExceeded();
-      }
-      console.error('Storage save failed:', error);
-      return false;
     }
-  }
 
-  // Load data from a specific versioned key
-  load(key) {
-    try {
-      const storageKey = this.keys[key];
-      if (!storageKey) {
-        throw new Error(`Unknown storage key: ${key}`);
-      }
+    load(name) {
+        if (!this.storage) return null;
+        try {
+            const key = this.resolveKey(name);
+            const raw = this.storage.getItem(key) ?? this.storage.getItem(LEGACY_KEYS[name]);
+            if (!raw) return null;
+            const payload = JSON.parse(raw);
+            if (!payload || payload.version !== this.version || !('data' in payload)) return null;
 
-      if (typeof localStorage === 'undefined') return null;
-
-      const raw = localStorage.getItem(storageKey);
-      if (!raw) return null;
-      
-      const payload = JSON.parse(raw);
-      
-      // Version migration logic
-      if (payload.version !== this.version) {
-        return this.migrate(key, payload);
-      }
-      
-      return payload.data;
-    } catch (error) {
-      console.error('Storage load failed:', error);
-      return null;
+            // Migrate a valid legacy payload once, without deleting its recovery copy.
+            if (!this.storage.getItem(key)) this.save(name, payload.data);
+            return payload.data;
+        } catch (error) {
+            console.error('Unable to load workspace:', error);
+            return null;
+        }
     }
-  }
 
-  // Remove data from a specific key
-  remove(key) {
-    try {
-      const storageKey = this.keys[key];
-      if (!storageKey) {
-        throw new Error(`Unknown storage key: ${key}`);
-      }
-      
-      if (typeof localStorage !== 'undefined') {
-        localStorage.removeItem(storageKey);
-      }
-      return true;
-    } catch (error) {
-      console.error('Storage remove failed:', error);
-      return false;
+    remove(name) {
+        if (!this.storage) return false;
+        this.storage.removeItem(this.resolveKey(name));
+        return true;
     }
-  }
 
-  // Clear all ResearchFlow data
-  clearAll() {
-    try {
-      if (typeof localStorage !== 'undefined') {
-        Object.values(this.keys).forEach(key => {
-          localStorage.removeItem(key);
-        });
-      }
-      return true;
-    } catch (error) {
-      console.error('Storage clear failed:', error);
-      return false;
+    clearAll() {
+        if (!this.storage) return false;
+        Object.values(STORAGE_KEYS).forEach((key) => this.storage.removeItem(key));
+        return true;
     }
-  }
 
-  // Handle data migration between versions
-  migrate(key, oldPayload) {
-    console.log(`Migrating ${key} from version ${oldPayload.version} to ${this.version}`);
-    
-    // Add migration logic here as versions change
-    // Example: if (oldPayload.version === 0) { /* transform data */ }
-    
-    return oldPayload.data;
-  }
-
-  // Handle storage quota exceeded
-  handleQuotaExceeded() {
-    // Could implement cleanup strategies here
-    // For now, just alert the user
-    console.warn('Storage is full. Consider exporting and clearing old data.');
-  }
-
-  // Get storage size for a specific key
-  getStorageSize(key) {
-    const storageKey = this.keys[key];
-    if (!storageKey) return 0;
-    
-    const data = localStorage.getItem(storageKey);
-    return data ? new Blob([data]).size : 0;
-  }
-
-  // Get total storage size
-  getTotalSize() {
-    return Object.keys(this.keys).reduce((total, key) => {
-      return total + this.getStorageSize(key);
-    }, 0);
-  }
-
-  // Get storage statistics
-  getStats() {
-    const totalSize = this.getTotalSize();
-    const maxSize = 5 * 1024 * 1024; // ~5MB typical localStorage limit
-    
-    return {
-      totalSize,
-      maxSize,
-      percentUsed: ((totalSize / maxSize) * 100).toFixed(2),
-      keys: Object.keys(this.keys).map(key => ({
-        name: key,
-        size: this.getStorageSize(key)
-      }))
-    };
-  }
+    getStats() {
+        if (!this.storage) return { totalSize: 0, keys: [] };
+        const keys = Object.entries(STORAGE_KEYS).map(([name, key]) => ({
+            name,
+            size: new Blob([this.storage.getItem(key) || '']).size,
+        }));
+        return { totalSize: keys.reduce((sum, entry) => sum + entry.size, 0), keys };
+    }
 }
 
 export const storage = new StorageManager();
-export { STORAGE_KEYS };
-
+export { LEGACY_KEYS, STORAGE_KEYS, StorageManager };

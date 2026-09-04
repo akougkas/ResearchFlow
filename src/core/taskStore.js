@@ -13,13 +13,13 @@ class TaskStore {
         this.subscribers.push(callback);
         return () => {
             // Return unsubscribe function
-            this.subscribers = this.subscribers.filter(cb => cb !== callback);
+            this.subscribers = this.subscribers.filter((cb) => cb !== callback);
         };
     }
 
     // Notify all subscribers of state changes
     notify() {
-        this.subscribers.forEach(callback => {
+        this.subscribers.forEach((callback) => {
             try {
                 callback(this.tasks);
             } catch (error) {
@@ -31,13 +31,16 @@ class TaskStore {
     load() {
         const data = storage.load('tasks');
         if (data && Array.isArray(data)) {
-            this.tasks = data.map(t => Task.fromJSON(t));
+            this.tasks = data.map((t) => Task.fromJSON(t));
             this.notify(); // Notify after initial load
         }
     }
 
     save() {
-        const success = storage.save('tasks', this.tasks.map(t => t.toJSON()));
+        const success = storage.save(
+            'tasks',
+            this.tasks.map((t) => t.toJSON()),
+        );
         if (success) {
             this.notify(); // Notify observers after save
         }
@@ -68,7 +71,7 @@ class TaskStore {
             generatedTasks.forEach((taskData, index) => {
                 const task = new Task({
                     ...taskData,
-                    dependencies: [] // Start with no dependencies
+                    dependencies: [], // Start with no dependencies
                 });
                 task.validate();
                 this.tasks.push(task);
@@ -82,8 +85,8 @@ class TaskStore {
                 if (taskData.dependencies && Array.isArray(taskData.dependencies)) {
                     // Convert indices to actual task IDs
                     createdTask.dependencies = taskData.dependencies
-                        .map(depIndex => indexToIdMap[depIndex])
-                        .filter(id => id !== undefined);
+                        .map((depIndex) => indexToIdMap[depIndex])
+                        .filter((id) => id !== undefined);
 
                     // Validate final dependencies
                     this.validateDependencies(createdTask);
@@ -94,7 +97,7 @@ class TaskStore {
             return createdTasks;
         } catch (error) {
             // Rollback: remove all created tasks if any validation fails
-            createdTasks.forEach(task => {
+            createdTasks.forEach((task) => {
                 const idx = this.tasks.indexOf(task);
                 if (idx !== -1) {
                     this.tasks.splice(idx, 1);
@@ -109,7 +112,7 @@ class TaskStore {
     }
 
     getById(id) {
-        return this.tasks.find(t => t.id === id);
+        return this.tasks.find((t) => t.id === id);
     }
 
     update(id, updates) {
@@ -121,7 +124,7 @@ class TaskStore {
             ...task.toJSON(),
             ...updates,
             id: task.id,
-            updatedAt: Date.now()
+            updatedAt: Date.now(),
         });
         candidate.validate();
 
@@ -149,24 +152,25 @@ class TaskStore {
     importTasks(taskData, { merge = false } = {}) {
         if (!Array.isArray(taskData)) throw new Error('Tasks must be an array');
 
-        const existing = merge ? this.tasks.map(task => task.toJSON()) : [];
-        const candidates = [...existing, ...taskData].map(data => new Task(data));
+        const existing = merge ? this.tasks.map((task) => task.toJSON()) : [];
+        const candidates = [...existing, ...taskData].map((data) => new Task(data));
         const ids = new Set();
 
-        candidates.forEach(task => {
+        candidates.forEach((task) => {
             task.validate();
             if (ids.has(task.id)) throw new Error(`Duplicate task ID: ${task.id}`);
             ids.add(task.id);
         });
 
-        candidates.forEach(task => {
+        candidates.forEach((task) => {
             for (const dependencyId of task.dependencies || []) {
                 if (dependencyId === task.id) throw new Error('Task cannot depend on itself');
-                if (!ids.has(dependencyId)) throw new Error(`Dependency not found: ${dependencyId}`);
+                if (!ids.has(dependencyId))
+                    throw new Error(`Dependency not found: ${dependencyId}`);
             }
         });
 
-        const byId = new Map(candidates.map(task => [task.id, task]));
+        const byId = new Map(candidates.map((task) => [task.id, task]));
         const visited = new Set();
         const active = new Set();
         const visit = (task) => {
@@ -175,23 +179,24 @@ class TaskStore {
             }
             if (visited.has(task.id)) return;
             active.add(task.id);
-            (task.dependencies || []).forEach(id => visit(byId.get(id)));
+            (task.dependencies || []).forEach((id) => visit(byId.get(id)));
             active.delete(task.id);
             visited.add(task.id);
         };
         candidates.forEach(visit);
 
         // Rebuild wiki links and backlinks against the complete imported set.
-        candidates.forEach(task => {
+        candidates.forEach((task) => {
             task.links = [];
             task.backlinks = [];
         });
-        candidates.forEach(task => {
+        candidates.forEach((task) => {
             const content = `${task.text} ${task.notes || ''}`;
             const matches = [...content.matchAll(/\[\[Task:(task_[^\]]+)\]\]/g)];
-            task.links = [...new Set(matches.map(match => match[1]))]
-                .filter(id => byId.has(id));
-            task.links.forEach(id => byId.get(id).backlinks.push(task.id));
+            task.links = [...new Set(matches.map((match) => match[1]))].filter((id) =>
+                byId.has(id),
+            );
+            task.links.forEach((id) => byId.get(id).backlinks.push(task.id));
         });
 
         const previous = this.tasks;
@@ -204,19 +209,19 @@ class TaskStore {
     }
 
     delete(id) {
-        const index = this.tasks.findIndex(t => t.id === id);
+        const index = this.tasks.findIndex((t) => t.id === id);
         if (index === -1) throw new Error('Task not found');
 
         // Remove this task from other tasks' dependencies and backlinks
-        this.tasks.forEach(task => {
+        this.tasks.forEach((task) => {
             if (task.dependencies.includes(id)) {
-                task.dependencies = task.dependencies.filter(depId => depId !== id);
+                task.dependencies = task.dependencies.filter((depId) => depId !== id);
             }
             if (task.links && task.links.includes(id)) {
-                task.links = task.links.filter(linkId => linkId !== id);
+                task.links = task.links.filter((linkId) => linkId !== id);
             }
             if (task.backlinks && task.backlinks.includes(id)) {
-                task.backlinks = task.backlinks.filter(linkId => linkId !== id);
+                task.backlinks = task.backlinks.filter((linkId) => linkId !== id);
             }
         });
 
@@ -245,7 +250,7 @@ class TaskStore {
             return true;
         }
 
-        return task.dependencies.every(depId => {
+        return task.dependencies.every((depId) => {
             const depTask = this.getById(depId);
             return depTask && depTask.completed;
         });
@@ -255,23 +260,21 @@ class TaskStore {
      * Get tasks that depend on a given task
      */
     getDependentTasks(taskId) {
-        return this.tasks.filter(task =>
-            task.dependencies && task.dependencies.includes(taskId)
-        );
+        return this.tasks.filter((task) => task.dependencies && task.dependencies.includes(taskId));
     }
 
     /**
      * Get all unblocked tasks (tasks with all dependencies completed or no dependencies)
      */
     getUnblockedTasks() {
-        return this.tasks.filter(task => this.canComplete(task.id));
+        return this.tasks.filter((task) => this.canComplete(task.id));
     }
 
     /**
      * Get all blocked tasks (tasks with incomplete dependencies)
      */
     getBlockedTasks() {
-        return this.tasks.filter(task => !this.canComplete(task.id) && !task.completed);
+        return this.tasks.filter((task) => !this.canComplete(task.id) && !task.completed);
     }
 
     /**
@@ -289,14 +292,14 @@ class TaskStore {
         }
 
         // Check all dependencies exist
-        task.dependencies.forEach(depId => {
+        task.dependencies.forEach((depId) => {
             if (!this.getById(depId)) {
                 throw new Error(`Dependency not found: ${depId}`);
             }
         });
 
         // Check for circular dependencies
-        const getTask = id => id === task.id ? task : this.getById(id);
+        const getTask = (id) => (id === task.id ? task : this.getById(id));
         const visited = new Set();
         const recursionStack = new Set();
 
@@ -336,8 +339,8 @@ class TaskStore {
         const regex = /\[\[Task:(task_[^\]]+)\]\]/g;
         const matches = [...combinedContent.matchAll(regex)];
 
-        const linkedIds = [...new Set(matches.map(m => m[1]))];
-        task.links = linkedIds.filter(id => this.getById(id));
+        const linkedIds = [...new Set(matches.map((m) => m[1]))];
+        task.links = linkedIds.filter((id) => this.getById(id));
     }
 
     /**
@@ -345,11 +348,11 @@ class TaskStore {
      */
     updateBacklinks(task, oldLinks = []) {
         // New links to add backlink to
-        const toAdd = task.links.filter(id => !oldLinks.includes(id));
+        const toAdd = task.links.filter((id) => !oldLinks.includes(id));
         // Old links to remove backlink from
-        const toRemove = oldLinks.filter(id => !task.links.includes(id));
+        const toRemove = oldLinks.filter((id) => !task.links.includes(id));
 
-        toAdd.forEach(id => {
+        toAdd.forEach((id) => {
             const target = this.getById(id);
             if (target) {
                 if (!target.backlinks) target.backlinks = [];
@@ -359,29 +362,29 @@ class TaskStore {
             }
         });
 
-        toRemove.forEach(id => {
+        toRemove.forEach((id) => {
             const target = this.getById(id);
             if (target && target.backlinks) {
-                target.backlinks = target.backlinks.filter(bid => bid !== task.id);
+                target.backlinks = target.backlinks.filter((bid) => bid !== task.id);
             }
         });
     }
 
     // Filtering methods
     filterByCategory(category) {
-        return this.tasks.filter(t => t.category === category);
+        return this.tasks.filter((t) => t.category === category);
     }
 
     filterByPriority(priority) {
-        return this.tasks.filter(t => t.priority === priority);
+        return this.tasks.filter((t) => t.priority === priority);
     }
 
     filterByCompleted(completed = true) {
-        return this.tasks.filter(t => t.completed === completed);
+        return this.tasks.filter((t) => t.completed === completed);
     }
 
     filterByDueDate(startDate, endDate) {
-        return this.tasks.filter(t => {
+        return this.tasks.filter((t) => {
             if (!t.dueDate) return false;
             const due = new Date(t.dueDate);
             return due >= startDate && due <= endDate;
@@ -390,19 +393,18 @@ class TaskStore {
 
     search(query) {
         const lowerQuery = query.toLowerCase();
-        return this.tasks.filter(t =>
-            t.text.toLowerCase().includes(lowerQuery) ||
-            t.notes.toLowerCase().includes(lowerQuery) ||
-            t.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+        return this.tasks.filter(
+            (t) =>
+                t.text.toLowerCase().includes(lowerQuery) ||
+                t.notes.toLowerCase().includes(lowerQuery) ||
+                t.tags.some((tag) => tag.toLowerCase().includes(lowerQuery)),
         );
     }
 
     // Sorting methods
     sortByDate(ascending = false) {
         return [...this.tasks].sort((a, b) => {
-            return ascending
-                ? a.createdAt - b.createdAt
-                : b.createdAt - a.createdAt;
+            return ascending ? a.createdAt - b.createdAt : b.createdAt - a.createdAt;
         });
     }
 
@@ -424,9 +426,9 @@ class TaskStore {
     // Statistics
     getStats() {
         const total = this.tasks.length;
-        const completed = this.tasks.filter(t => t.completed).length;
-        const overdue = this.tasks.filter(t =>
-            t.dueDate && new Date(t.dueDate) < new Date() && !t.completed
+        const completed = this.tasks.filter((t) => t.completed).length;
+        const overdue = this.tasks.filter(
+            (t) => t.dueDate && new Date(t.dueDate) < new Date() && !t.completed,
         ).length;
         const blocked = this.getBlockedTasks().length;
 
@@ -436,7 +438,7 @@ class TaskStore {
             pending: total - completed,
             overdue,
             blocked,
-            completionRate: total > 0 ? (completed / total * 100).toFixed(1) : 0
+            completionRate: total > 0 ? ((completed / total) * 100).toFixed(1) : 0,
         };
     }
 }

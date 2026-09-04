@@ -12,13 +12,13 @@ export class ExportImportEngine {
     static exportWorkspaceJSON() {
         const tasks = taskStore.getAll();
         const stats = taskStore.getStats();
-        
+
         const payload = {
             version: '1.0.0',
             app: 'ResearchFlow',
             exportedAt: new Date().toISOString(),
             stats: stats,
-            tasks: tasks
+            tasks: tasks,
         };
 
         return JSON.stringify(payload, null, 2);
@@ -50,7 +50,10 @@ export class ExportImportEngine {
         const tasks = taskStore.getAll();
         const stats = taskStore.getStats();
         const dateStr = new Date().toLocaleDateString('en-US', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
         });
 
         let md = `# 🔬 ResearchFlow - Notebook Export\n`;
@@ -61,14 +64,14 @@ export class ExportImportEngine {
         md += `## 📊 Active Research Protocols\n\n`;
 
         const categories = {};
-        tasks.forEach(t => {
+        tasks.forEach((t) => {
             if (!categories[t.category]) categories[t.category] = [];
             categories[t.category].push(t);
         });
 
         for (const [cat, catTasks] of Object.entries(categories)) {
             md += `### ${cat.toUpperCase()} (${catTasks.length})\n`;
-            catTasks.forEach(t => {
+            catTasks.forEach((t) => {
                 const statusSymbol = t.completed ? '✅' : '⏳';
                 const due = t.dueDate ? ` *(Due: ${t.dueDate})*` : '';
                 const prio = `[Priority: ${t.priority.toUpperCase()}]`;
@@ -107,7 +110,7 @@ export class ExportImportEngine {
 
     /**
      * Validate and import workspace JSON file content
-     * @param {string} jsonString 
+     * @param {string} jsonString
      * @param {boolean} merge - If true, merges with current tasks; if false, overwrites.
      */
     static importWorkspaceJSON(jsonString, merge = false) {
@@ -117,8 +120,10 @@ export class ExportImportEngine {
                 throw new Error('Invalid ResearchFlow backup format: missing tasks array.');
             }
 
-            if (data.tasks.some(task => !task || !task.id || !task.text)) {
-                throw new Error('Invalid ResearchFlow backup format: every task needs an ID and text.');
+            if (data.tasks.some((task) => !task || !task.id || !task.text)) {
+                throw new Error(
+                    'Invalid ResearchFlow backup format: every task needs an ID and text.',
+                );
             }
 
             const importedCount = taskStore.importTasks(data.tasks, { merge });

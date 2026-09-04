@@ -1,22 +1,22 @@
 {
-  "name": "Gnosis Tasks",
-  "short_name": "Tasks",
-  "description": "A calm workspace for ambitious research",
-  "id": "../",
-  "start_url": "../",
-  "scope": "../",
-  "display": "standalone",
-  "theme_color": "#f4f1e9",
-  "background_color": "#f7f6f1",
-  "orientation": "any",
-  "icons": [
-    {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect rx='42' fill='%2316231f' width='192' height='192'/><rect x='47' y='103' width='22' height='42' rx='11' fill='%23c7ed71'/><rect x='85' y='47' width='22' height='98' rx='11' fill='%23c7ed71'/><rect x='123' y='76' width='22' height='69' rx='11' fill='%23c7ed71'/></svg>",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    }
-  ],
-  "categories": ["productivity"],
-  "categories": ["productivity", "education"]
+    "name": "Gnosis Tasks",
+    "short_name": "Tasks",
+    "description": "A calm workspace for ambitious research",
+    "id": "../",
+    "start_url": "../",
+    "scope": "../",
+    "display": "standalone",
+    "theme_color": "#f4f1e9",
+    "background_color": "#f7f6f1",
+    "orientation": "any",
+    "icons": [
+        {
+            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect rx='42' fill='%2316231f' width='192' height='192'/><rect x='47' y='103' width='22' height='42' rx='11' fill='%23c7ed71'/><rect x='85' y='47' width='22' height='98' rx='11' fill='%23c7ed71'/><rect x='123' y='76' width='22' height='69' rx='11' fill='%23c7ed71'/></svg>",
+            "sizes": "192x192",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        }
+    ],
+    "categories": ["productivity"],
+    "categories": ["productivity", "education"]
 }

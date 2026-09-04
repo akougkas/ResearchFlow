@@ -8,7 +8,8 @@ new GnosisTasksApp(document.querySelector('#app'), taskStore).mount();
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register(new URL('../../sw.js', import.meta.url))
-            .catch(error => console.warn('Offline support unavailable:', error));
+        navigator.serviceWorker
+            .register(new URL('../../sw.js', import.meta.url))
+            .catch((error) => console.warn('Offline support unavailable:', error));
     });
 }
