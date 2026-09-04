@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gnosis Tasks — Full-Stack Build Session Charter</title>
+  <style>
+    :root { color-scheme: light; --ink:#17201d; --muted:#5d6963; --paper:#f6f4ec; --panel:#fff; --green:#1e382d; --lime:#c7ed71; --line:#dcded7; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.65 Inter,ui-sans-serif,system-ui,sans-serif; }
+    main { width:min(1100px,calc(100% - 40px)); margin:48px auto; }
+    header { background:var(--green); color:white; border-radius:18px; padding:42px 48px; box-shadow:0 18px 50px #1830251a; }
+    header span { display:inline-block; color:var(--lime); font-size:12px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
+    h1 { margin:8px 0 10px; font:400 44px/1.1 Georgia,serif; }
+    header p { margin:0; color:#c4d0ca; max-width:760px; }
+    section { background:var(--panel); border:1px solid var(--line); border-radius:14px; margin:22px 0; padding:32px 38px; }
+    h2 { margin:0 0 12px; font:400 28px/1.2 Georgia,serif; }
+    .note { color:var(--muted); }
+    pre { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; font:14px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace; color:#1d2924; }
+    code { background:#edf0e9; border-radius:4px; padding:2px 5px; }
+    footer { color:var(--muted); font-size:13px; padding:12px 4px 50px; }
+    @media print { body{background:white} main{width:100%;margin:0} header,section{box-shadow:none;break-inside:avoid} }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <span>New-session charter · September 2026</span>
+    <h1>Build Gnosis Tasks as a production full-stack service</h1>
+    <p>This document is both the handoff context and the exact prompt for a fresh autonomous engineering session inside the private Gnosis Toolkit repository.</p>
+  </header>
+
+  <section>
+    <h2>How to use</h2>
+    <p class="note">Start the new coding session at the root of a clone of <code>grc-iit/gnosis-toolkit</code>. Give the agent the entire prompt below. Do not start the session in the legacy ResearchFlow checkout.</p>
+  </section>
+
+  <section>
+<pre>You are the principal product engineer and technical lead for the Gnosis Research Center toolkit. Work autonomously until the Gnosis Tasks application is genuinely implemented, tested, documented, containerized, and ready for a self-hosted deployment. Do not stop at a plan, scaffold, static mockup, or partial vertical slice. Make reasonable product decisions, document consequential ones, commit coherent checkpoints as you work, and finish with a clean repository, passing verification, and an operational Docker Compose deployment.
+
+WORKING LOCATION AND REPOSITORY BOUNDARY
+
+You are running at the root of the private repository:
+  https://github.com/grc-iit/gnosis-toolkit
+
+Inspect the repository and all applicable AGENTS.md, CLAUDE.md, contribution, license, CI, and architecture instructions before editing. Preserve unrelated toolkit work. The toolkit is the ecosystem/portfolio repository and currently lists gnosis-tasks as a planned independent tool. Decide, based on the repository's current conventions, whether the implementation belongs under a robust monorepo path such as apps/tasks or whether this session should create a clearly extractable package intended to become grc-iit/gnosis-tasks. Do not create a confused hybrid. Record the decision in an ADR and make the application independently buildable and deployable.
+
+REFERENCE IMPLEMENTATION AND MIGRATION SOURCE
+
+Inspect the public reference repository and its complete relevant history:
+  https://github.com/akougkas/ResearchFlow
+
+The last verified redesign commit at handoff is:
+  4dc4189822213cc44aa1790660c50d494c813a5e
+
+Clone or fetch that repository into a temporary/reference location outside the toolkit worktree. Treat it as a product and interaction reference, not as an architecture mandate. Study:
+
+- the Gnosis Tasks visual direction;
+- focus, all-work, board, schedule, detail, and quick-capture interactions;
+- the realistic Atlas research demo;
+- task dependency validation and atomic JSON import;
+- the mistakes documented in its history and README;
+- its browser screenshots and tests where useful.
+
+Do not blindly copy its vanilla-JavaScript internals. This is a ground-up, production full-stack implementation. Preserve or improve the successful product language and restrained visual identity. Explicitly reject the older cyberpunk UI, fake AI generator, theme collection, decorative analytics, and unused repository-pattern code. There is no compatibility requirement for dead implementation details. If importing a legacy ResearchFlow JSON backup is inexpensive and safe, support it through a tested one-time importer; otherwise document why it is excluded.
+
+ORGANIZATIONAL CONTEXT
+
+Gnosis Research Center at Illinois Institute of Technology works at the intersection of scalable computing and data-driven discovery. The product should feel credible to principal investigators, research software engineers, graduate researchers, and collaborators. It must support the real movement of research: questions become work; work has owners, dependencies, milestones, evidence, and decisions; completed work contributes to reproducible outcomes.
+
+The intended Gnosis service family is:
+
+- tasks.gnosis.run — this application;
+- chat.gnosis.run — a future evidence-grounded knowledge interface;
+- grc-iit/gnosisAI — private corpus/model experimentation and future retrieval/inference services;
+- grc-iit/gnosis-toolkit — portfolio, shared conventions, and discovery surface;
+- akougkas/gnosis-run — an existing private URL-shortener service, not this application's backend.
+
+Do not couple Gnosis Tasks to the current GnosisAI model. The gnosisAI repository explicitly reports that its first adapter is not deployment-ready. Define a clean, optional, future-facing integration contract, but ship Tasks without simulated AI. Suggestions must eventually be citation-preserving, visibly non-authoritative, and grounded in approved project context.
+
+PRODUCT MISSION
+
+Build a calm research operating surface that answers four questions exceptionally well:
+
+1. What research work can I move forward today?
+2. What is blocked, by what, and who can unblock it?
+3. What evidence or decision will establish that an item is actually complete?
+4. What deadlines, milestones, and risks are approaching across our projects?
+
+Generic task-management behavior is necessary but insufficient. Research-native semantics and excellent information design are the differentiator.
+
+REQUIRED MVP CAPABILITIES
+
+Identity and access:
+
+- Secure local accounts with administrator-created invitations or another deliberately documented bootstrap flow.
+- Password hashing using a modern password-hashing algorithm and secure session handling with HttpOnly cookies.
+- CSRF protection where applicable, rate limiting on authentication endpoints, session revocation, and no secrets shipped to the browser.
+- Roles at minimum: administrator, project lead, member, and viewer. Enforce authorization on the server, not only in the UI.
+- Keep an OIDC integration seam for future Illinois Tech or institutional identity without pretending it is configured now.
+
+Projects and membership:
+
+- Create, edit, archive, and switch research projects.
+- Project title, short code, description, research area, status, lead, members, start/end dates, and optional external links.
+- Project membership and role management with explicit authorization rules.
+- A project overview that communicates progress, blocked work, near-term milestones, and recent activity without vanity metrics.
+
+Research work:
+
+- Create, read, update, archive/delete, assign, and complete research items.
+- Title, description/notes, project, research area, priority, workflow state, assignee, creator, due date, tags, created/updated/completed timestamps.
+- Workflow states should be intentionally small and documented. Prefer Planned, In progress, In review, and Complete; blocked is derived from unmet dependencies rather than a manually inconsistent state.
+- Dependencies with referential integrity, self-dependency rejection, cycle detection, deletion behavior, and clear UI explanations.
+- Completion criteria and evidence: a task can record acceptance criteria, links, notes, and small file attachments or artifact references. Decide whether evidence is required per item/project; do not force meaningless uploads.
+- Activity/audit history for important mutations.
+- Optimistic concurrency or an equivalent mechanism preventing silent last-write-wins data loss.
+- Search, filters, stable sorting, pagination or bounded queries, and useful empty/error/loading states.
+
+Core product surfaces:
+
+- Focus: urgent and high-priority work that is ready, with a transparent prioritization explanation.
+- All work: fast searchable/filterable table or list with bulk-safe interactions.
+- Board: a credible pipeline view. If drag-and-drop is shipped, it must be keyboard accessible and persist reliably; otherwise use explicit state controls rather than a fake draggable affordance.
+- Schedule: deadline and milestone view with overdue and timezone-correct behavior.
+- Task detail: full context, dependencies, evidence, activity, edit, completion, archive/delete.
+- Project overview and project settings/member management.
+- Account/session settings and workspace administration appropriate to the selected tenancy model.
+- Responsive behavior for desktop, tablet, and usable mobile workflows.
+
+Notifications and collaboration:
+
+- In-app notification model for assignment, approaching deadlines, and dependency unblocking. A minimal notification center is acceptable.
+- Do not require email infrastructure for first deployment. Define an adapter/interface and document SMTP as a later configuration if not implemented.
+- Comments are desirable if they can be delivered robustly; otherwise put them in the next milestone and retain activity history plus notes in MVP.
+
+Backup and operations:
+
+- Administrator backup/export and documented restore procedure covering PostgreSQL and uploaded artifacts.
+- Health, readiness, and version endpoints.
+- Structured logs with request correlation identifiers and no secrets or raw passwords.
+- Database migrations that run as an explicit deployment job or safe startup step; avoid race-prone migrations from every replica.
+- Seed command for a realistic, idempotent Atlas research demonstration. Never seed production implicitly.
+
+TECHNICAL BASELINE
+
+Choose a boring, maintainable stack suitable for a small research center and justify material deviations. The preferred baseline is:
+
+Frontend:
+
+- React with TypeScript and Vite.
+- A small, intentional component system using accessible primitives; avoid adopting a huge design system solely for speed.
+- TanStack Query or an equivalent disciplined server-state layer.
+- React Router if client routes are required.
+- React Hook Form plus schema validation, or an equally robust typed form approach.
+- Preserve the restrained Gnosis Tasks visual language: warm neutral canvas, deep green navigation, acid-lime accent used sparingly, editorial serif display type paired with a highly readable sans serif, strong spacing, minimal ornament.
+- No emoji as interface icons. Use one consistent SVG icon family and accessible labels.
+- Meet WCAG 2.2 AA in automated checks and keyboard/manual smoke paths.
+
+Backend:
+
+- Python 3.12+ with FastAPI.
+- uv for Python dependency and lockfile management; never create an untracked pip-only environment contract.
+- SQLAlchemy 2.x and Alembic, or SQLModel only if it does not obscure migrations and domain constraints.
+- Pydantic v2 at API boundaries.
+- PostgreSQL as the authoritative database.
+- Store uploads behind a storage interface. A mounted local volume is acceptable for the initial self-hosted deployment; preserve a future S3-compatible adapter seam.
+- Do not add Redis, Celery, Kafka, or a worker service unless a demonstrated requirement justifies the operational cost. Prefer fewer reliable containers.
+- Generate and commit an OpenAPI contract. Generate frontend API types/client from that contract or enforce another single-source typed boundary.
+
+Data model expectations:
+
+- Use UUIDs or another collision-safe server-generated identifier.
+- Include organizations/workspaces only if needed for a coherent tenancy model. A single Gnosis workspace with multiple projects is a valid first deployment, but encode the decision deliberately.
+- Core entities will likely include users, sessions/invitations, projects, project_members, tasks, task_dependencies, task_tags/tags, acceptance_criteria, evidence/artifacts, milestones, notifications, and audit_events.
+- Add database constraints and indexes for invariants and common query paths. Application validation is not a substitute for referential integrity.
+- Store timestamps in UTC and render them in the user's configured/local timezone.
+- Use soft deletion only where recovery/audit semantics justify it; do not spread nullable deleted_at columns indiscriminately.
+
+API quality:
+
+- Version API routes, use predictable resource shapes, correct HTTP semantics, bounded collection endpoints, machine-readable errors, and request validation.
+- Prevent broken-object-level authorization and mass-assignment bugs.
+- Avoid returning ORM objects without intentional response schemas.
+- Document idempotency behavior for mutation endpoints that may be retried.
+
+CONTAINER AND SELF-HOSTING CONTRACT
+
+Deliver a root-level Docker Compose experience suitable for the user's mini server and future tasks.gnosis.run deployment.
+
+Required containers, unless a simpler architecture is rigorously justified:
+
+- web: immutable production frontend image served by an unprivileged web server;
+- api: non-root production backend image with a real ASGI process configuration;
+- db: pinned PostgreSQL major version with a named persistent volume and healthcheck;
+- migrate: one-shot service/profile or documented command applying Alembic migrations safely.
+
+Requirements:
+
+- Multi-stage Dockerfiles, pinned major/runtime versions, small runtime images, non-root users, read-only filesystem where practical, tmpfs for required temporary paths, healthchecks, restart policies, and graceful shutdown.
+- No source bind mounts or development servers in the production Compose profile.
+- Separate compose.override.yml or profiles for development ergonomics if useful.
+- A committed .env.example containing safe placeholders and exhaustive documentation. Never commit live credentials.
+- Docker secrets or file-based secret support for sensitive production configuration where Compose supports it cleanly.
+- Named volumes for PostgreSQL and uploads. Document ownership, backup, restore, and upgrade procedures.
+- Internal-only database networking. Only the intended HTTP entrypoint should bind to the host by default.
+- Support reverse-proxy deployment behind Caddy, Traefik, or nginx. Honor forwarded headers only from configured trusted proxies.
+- Provide an example Caddy or reverse-proxy snippet for tasks.gnosis.run, including TLS expectations, upload limits, security headers, and websocket settings only if websockets are actually used.
+- Add a Makefile, justfile, or documented task runner with obvious commands: bootstrap, dev, test, lint, typecheck, build, up, down, logs, migrate, seed-demo, backup, restore.
+- Verify the full stack using Docker Compose, not only host-installed runtimes.
+
+SECURITY AND PRIVACY BASELINE
+
+- Produce a concise threat model covering authentication, authorization, CSRF/XSS, uploads, dependency supply chain, backups, reverse proxy trust, and private research data.
+- Apply restrictive CORS; same-origin production should not need permissive CORS.
+- Use a Content Security Policy compatible with the actual frontend. Self-host fonts/assets in production rather than depending on Google Fonts.
+- Validate upload size, MIME type, filename handling, and storage paths; never trust extensions or allow path traversal.
+- Use secure response headers, parameterized database access, sanitized rendering, and dependency vulnerability scanning.
+- Redact credentials and sensitive fields from logs and API errors.
+- Do not claim HIPAA, FERPA, FISMA, or other compliance without an actual program and review.
+- Document the privacy boundary and that self-hosting does not itself create compliance.
+
+TESTING AND QUALITY GATES
+
+Build a test pyramid that proves important behavior rather than maximizing counts.
+
+Backend:
+
+- Unit tests for prioritization, dependency cycles, authorization policy, and domain transitions.
+- API integration tests against PostgreSQL for CRUD, membership boundaries, concurrency, search/filtering, migrations, and error contracts.
+- Migration test from an empty database to head and, where practical, upgrade tests across committed revisions.
+- Backup/restore smoke procedure.
+- Ruff formatting/lint, strict-enough mypy or pyright, pytest with meaningful coverage thresholds on domain/service code.
+
+Frontend:
+
+- TypeScript strict mode with no unexplained any.
+- Component tests for critical forms and dependency/status behavior.
+- Playwright end-to-end tests for login, project creation/switching, task CRUD, assignment, dependencies/blocking/unblocking, completion/evidence, search, mobile navigation, and authorization denial.
+- Automated axe checks with zero serious/critical violations, plus keyboard traversal smoke checks.
+- Deterministic screenshots for the primary desktop and mobile surfaces as CI artifacts, not committed generated files.
+
+System:
+
+- docker compose config validation;
+- container image build for every service;
+- compose-based smoke test from an empty volume/database;
+- health/readiness validation;
+- dependency and container-image vulnerability reporting with documented severity policy;
+- no flaky sleeps when readiness polling or healthchecks can be used.
+
+CI must run on pull requests and main-branch pushes. Pin actions to current supported major versions or full SHAs according to toolkit policy, use least-privilege permissions, cache safely, and avoid exposing secrets to untrusted pull requests.
+
+DOCUMENTATION AND DECISIONS
+
+Deliver concise, maintained documentation rather than generated filler:
+
+- root/tool README with product purpose, screenshots, architecture, local development, testing, Compose deployment, upgrade, backup, and restore;
+- docs/architecture.md with a small system diagram and data-flow explanation;
+- docs/deployment.md for the mini server and tasks.gnosis.run reverse proxy;
+- docs/security.md with threat model and operational guidance;
+- docs/backup-restore.md with tested commands;
+- ADRs for repository placement, tenancy/auth strategy, stack selection, and storage/uploads;
+- OpenAPI artifact and data model/migration guidance;
+- CONTRIBUTING guidance consistent with the toolkit.
+
+Keep all claims measured and honest. If a feature is deferred, mark it explicitly. Do not describe future seams as implemented functionality.
+
+WORKING METHOD AND CHECKPOINTS
+
+1. Inspect toolkit instructions, branches, status, existing CI, licensing, and repository intent.
+2. Inspect the reference ResearchFlow/Gnosis Tasks repo and the Gnosis website/toolkit context.
+3. Write a short implementation plan and ADRs, then immediately begin implementation.
+4. Establish the full vertical foundation: database, migration, API, typed client, app shell, auth, and Compose.
+5. Implement product capabilities in coherent slices. Commit after each verified slice with conventional, meaningful messages.
+6. Run focused tests continuously and full gates at checkpoints.
+7. Use browser screenshots to critique the actual product. Fix visual hierarchy, overflow, empty states, contrast, and responsive behavior rather than trusting code inspection.
+8. Exercise the production Compose stack from empty state, seed the Atlas demo explicitly, and run Playwright against the containers.
+9. Audit tracked, untracked, ignored, and generated files; scan for secrets; inspect the final diff and branch state.
+10. Push only when authorized by the session/user and only after all gates pass. If push is requested, verify the remote commit and CI result.
+
+Do not preserve weak code merely because it exists. Do preserve user work and unrelated toolkit content. Do not perform repository ownership transfer, visibility changes, DNS changes, or production deployment without confirming exact targets and credentials, even if implementation authority is broad.
+
+DEFINITION OF DONE
+
+The session is not complete until all of the following are true:
+
+- A new contributor can clone the toolkit, run one documented bootstrap command, and start frontend, API, and PostgreSQL.
+- A production Compose deployment builds and becomes healthy from empty state.
+- An administrator can bootstrap/login, create a project, invite or add a member, and manage roles.
+- A member can create and manage research work, dependencies, criteria, evidence, and milestones within authorized projects.
+- Focus, all-work, board, schedule, project overview, and task detail are coherent, responsive, and accessible.
+- Blocked/unblocked behavior is derived correctly and tested at domain, API, and browser levels.
+- Data survives container recreation through named volumes.
+- Backup and restore instructions have been exercised on a disposable environment.
+- Unit, integration, type, lint, formatting, accessibility, E2E, container build, and Compose smoke gates pass.
+- No committed secrets, development artifacts, test screenshots, database files, or dependency directories exist.
+- Documentation reflects the actual implementation and lists remaining risks honestly.
+- The final handoff reports architecture, major decisions, commands, verification evidence, commits, remaining limitations, and the exact deployment next steps for tasks.gnosis.run.
+
+Begin by auditing the toolkit repository and the reference commit. Then build the system. Do not ask broad preference questions when a reversible, conventional engineering decision will keep progress moving.</pre>
+  </section>
+
+  <footer>Prepared as a durable handoff artifact for the Gnosis Research Center toolkit. Source reference: akougkas/ResearchFlow at commit 4dc4189.</footer>
+</main>
+</body>
+</html>
