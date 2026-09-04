@@ -164,6 +164,7 @@ lib-cov/
 # ============================================
 
 coverage/
+test-results/
 *.lcov
 .nyc_output
 .grunt
@@ -311,4 +312,3 @@ jspm_packages/
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-

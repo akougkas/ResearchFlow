@@ -117,14 +117,20 @@ class TaskStore {
         if (!task) throw new Error('Task not found');
 
         const oldLinks = [...(task.links || [])];
-        Object.assign(task, updates);
-        task.updatedAt = Date.now();
-        task.validate();
+        const candidate = new Task({
+            ...task.toJSON(),
+            ...updates,
+            id: task.id,
+            updatedAt: Date.now()
+        });
+        candidate.validate();
 
         // If dependencies changed, validate them
-        if (updates.dependencies) {
-            this.validateDependencies(task);
+        if (updates.dependencies !== undefined) {
+            this.validateDependencies(candidate);
         }
+
+        Object.assign(task, candidate.toJSON());
 
         // Refresh links if notes or text changed
         if (updates.notes !== undefined || updates.text !== undefined) {
@@ -134,6 +140,67 @@ class TaskStore {
 
         this.save();
         return task;
+    }
+
+    /**
+     * Atomically replace or merge workspace tasks.
+     * The candidate graph is fully validated before live state is changed.
+     */
+    importTasks(taskData, { merge = false } = {}) {
+        if (!Array.isArray(taskData)) throw new Error('Tasks must be an array');
+
+        const existing = merge ? this.tasks.map(task => task.toJSON()) : [];
+        const candidates = [...existing, ...taskData].map(data => new Task(data));
+        const ids = new Set();
+
+        candidates.forEach(task => {
+            task.validate();
+            if (ids.has(task.id)) throw new Error(`Duplicate task ID: ${task.id}`);
+            ids.add(task.id);
+        });
+
+        candidates.forEach(task => {
+            for (const dependencyId of task.dependencies || []) {
+                if (dependencyId === task.id) throw new Error('Task cannot depend on itself');
+                if (!ids.has(dependencyId)) throw new Error(`Dependency not found: ${dependencyId}`);
+            }
+        });
+
+        const byId = new Map(candidates.map(task => [task.id, task]));
+        const visited = new Set();
+        const active = new Set();
+        const visit = (task) => {
+            if (active.has(task.id)) {
+                throw new Error('Circular dependency detected. Task dependencies form a cycle.');
+            }
+            if (visited.has(task.id)) return;
+            active.add(task.id);
+            (task.dependencies || []).forEach(id => visit(byId.get(id)));
+            active.delete(task.id);
+            visited.add(task.id);
+        };
+        candidates.forEach(visit);
+
+        // Rebuild wiki links and backlinks against the complete imported set.
+        candidates.forEach(task => {
+            task.links = [];
+            task.backlinks = [];
+        });
+        candidates.forEach(task => {
+            const content = `${task.text} ${task.notes || ''}`;
+            const matches = [...content.matchAll(/\[\[Task:(task_[^\]]+)\]\]/g)];
+            task.links = [...new Set(matches.map(match => match[1]))]
+                .filter(id => byId.has(id));
+            task.links.forEach(id => byId.get(id).backlinks.push(task.id));
+        });
+
+        const previous = this.tasks;
+        this.tasks = candidates;
+        if (!this.save()) {
+            this.tasks = previous;
+            throw new Error('Unable to persist imported workspace');
+        }
+        return taskData.length;
     }
 
     delete(id) {
@@ -229,6 +296,7 @@ class TaskStore {
         });
 
         // Check for circular dependencies
+        const getTask = id => id === task.id ? task : this.getById(id);
         const visited = new Set();
         const recursionStack = new Set();
 
@@ -236,7 +304,7 @@ class TaskStore {
             visited.add(taskId);
             recursionStack.add(taskId);
 
-            const currentTask = this.getById(taskId);
+            const currentTask = getTask(taskId);
             if (currentTask && currentTask.dependencies) {
                 for (const depId of currentTask.dependencies) {
                     if (!visited.has(depId)) {
@@ -374,4 +442,3 @@ class TaskStore {
 }
 
 export const taskStore = new TaskStore();
-

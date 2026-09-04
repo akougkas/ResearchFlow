@@ -1,5 +1,17 @@
 {
-  "dependencies": {
+  "name": "researchflow",
+  "version": "1.0.0-beta.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/run-tests.js",
+    "test:e2e": "node tests/capture-screenshots.js",
+    "check": "npm test && node tests/check-project.js"
+  },
+  "devDependencies": {
     "playwright": "^1.62.1"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

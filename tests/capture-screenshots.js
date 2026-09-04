@@ -3,17 +3,15 @@
  */
 
 import { chromium } from 'playwright';
-import fs from 'fs';
+import { mkdir } from 'node:fs/promises';
 import path from 'path';
+import process from 'process';
 
-const ARTIFACT_DIR = '/home/akougkas/.gemini/antigravity-cli/brain/43f1796d-b685-41cb-af5a-a60da240e8f4';
-const SCRATCH_DIR = path.join(ARTIFACT_DIR, 'scratch');
-
-if (!fs.existsSync(SCRATCH_DIR)) {
-    fs.mkdirSync(SCRATCH_DIR, { recursive: true });
-}
+const SCRATCH_DIR = path.resolve(process.env.ARTIFACT_DIR || 'test-results/screenshots');
+const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
 
 async function runVisualInspection() {
+    await mkdir(SCRATCH_DIR, { recursive: true });
     console.log('🌐 Launching Headless Chromium to visually inspect ResearchFlow...');
     const browser = await chromium.launch({ headless: true });
     const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
@@ -27,8 +25,8 @@ async function runVisualInspection() {
 
     try {
         // 1. Load Main Dashboard
-        console.log('  1. Navigating to http://localhost:8000 ...');
-        await page.goto('http://localhost:8000', { waitUntil: 'networkidle' });
+        console.log(`  1. Navigating to ${BASE_URL} ...`);
+        await page.goto(BASE_URL, { waitUntil: 'networkidle' });
         await page.waitForTimeout(1000);
         await page.screenshot({ path: path.join(SCRATCH_DIR, '01_matrix_view.png') });
 
@@ -94,6 +92,10 @@ async function runVisualInspection() {
         await page.screenshot({ path: path.join(SCRATCH_DIR, '10_matrix_theme_applied.png') });
         await page.click('#system-menu-close');
 
+        if (pageErrors.length > 0) {
+            throw new Error(`Browser page errors: ${pageErrors.join('; ')}`);
+        }
+
         console.log('\n✅ Visual inspection completed successfully!');
         console.log(`Console logs captured (${consoleLogs.length}):`);
         consoleLogs.slice(0, 5).forEach(l => console.log('  ', l));
@@ -101,6 +103,7 @@ async function runVisualInspection() {
 
     } catch (err) {
         console.error('❌ Visual inspection error:', err);
+        process.exitCode = 1;
     } finally {
         await browser.close();
     }

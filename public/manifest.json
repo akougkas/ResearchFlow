@@ -2,8 +2,9 @@
   "name": "ResearchFlow - Research Task Manager",
   "short_name": "ResearchFlow",
   "description": "AI-powered todo app for scientific researchers",
-  "start_url": "/",
-  "scope": "/",
+  "id": "../",
+  "start_url": "../",
+  "scope": "../",
   "display": "standalone",
   "theme_color": "#0d1421",
   "background_color": "#0d1421",
@@ -25,4 +26,3 @@
     }
   ]
 }
-

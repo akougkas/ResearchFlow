@@ -18,7 +18,8 @@ class App {
     registerServiceWorker() {
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/public/sw.js')
+                const workerUrl = new URL('../../sw.js', import.meta.url);
+                navigator.serviceWorker.register(workerUrl)
                     .then(reg => console.log('ResearchFlow SW registered:', reg.scope))
                     .catch(err => console.log('SW registration failed:', err));
             });

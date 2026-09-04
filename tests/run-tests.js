@@ -71,6 +71,7 @@ async function runTests() {
     assertThrows(() => {
         taskStore.update(tA.id, { dependencies: [tB.id] });
     }, 'Circular dependency detection prevents A -> B -> A cycle');
+    assert(!tA.dependencies.includes(tB.id), 'Rejected update leaves task state unchanged');
 
     // TEST 3: Bi-Directional Wiki Link Parser
     console.log('\n--- TEST GROUP 3: Bi-Directional Wiki Link Parsing ---');
@@ -91,6 +92,27 @@ async function runTests() {
     const markdownNotebook = ExportImportEngine.exportNotebookMarkdown();
     assert(markdownNotebook.includes('# 🔬 ResearchFlow - Notebook Export'), 'Markdown notebook header generated');
     assert(markdownNotebook.includes('Task A (Primary Protocol)'), 'Markdown notebook contains task entries');
+
+    const beforeInvalidImport = taskStore.getAll().map(task => task.id);
+    const invalidImport = ExportImportEngine.importWorkspaceJSON(JSON.stringify({
+        tasks: [{ id: 'task_invalid', text: 'Invalid dependency', dependencies: ['task_missing'] }]
+    }));
+    assert(invalidImport.success === false, 'Invalid workspace import is rejected');
+    assert(
+        JSON.stringify(taskStore.getAll().map(task => task.id)) === JSON.stringify(beforeInvalidImport),
+        'Rejected workspace import preserves existing data'
+    );
+
+    const forwardDependencyImport = ExportImportEngine.importWorkspaceJSON(JSON.stringify({
+        tasks: [
+            { id: 'task_second', text: 'Second task', dependencies: ['task_first'] },
+            { id: 'task_first', text: 'First task', dependencies: [] }
+        ]
+    }));
+    assert(forwardDependencyImport.success && forwardDependencyImport.count === 2,
+        'Workspace import supports forward dependency references');
+    assert(taskStore.getById('task_second').dependencies.includes('task_first'),
+        'Imported dependency graph is preserved');
 
     // TEST 5: Voice Auto-Categorization Engine
     console.log('\n--- TEST GROUP 5: Voice Dictation Auto-Categorization ---');

@@ -19,11 +19,10 @@ An intelligent, **research-focused** task manager designed specifically for scie
 ### Development Server
 
 ```bash
-# Navigate to project
-cd /home/akougkas/projects/ResearchFlow
+npm ci
 
 # Start local development server
-python -m http.server 8000
+python3 -m http.server 8000
 
 # Open browser
 # Navigate to http://localhost:8000
@@ -32,9 +31,16 @@ python -m http.server 8000
 ### Running Automated Test Suite
 
 ```bash
-# Run 21-test unit & integration suite
-node tests/run-tests.js
+# Run unit, integration, and project-integrity checks
+npm run check
+
+# Run the Playwright browser smoke test (server must be running)
+npx playwright install chromium
+npm run test:e2e
 ```
+
+Requires Node.js 20 or newer. The application itself has no build step; npm is
+used only for automated verification and browser testing.
 
 ## ⌨️ Keyboard Shortcuts
 
@@ -92,15 +98,35 @@ ResearchFlow/
 
 ## 🧪 Testing
 
-Execute unit and integration tests covering data models, taskStore dependencies, bi-directional linking, JSON/Markdown export, and voice auto-categorization:
+Execute unit and integration tests covering data models, atomic workspace import,
+task dependencies, bi-directional linking, JSON/Markdown export, voice
+auto-categorization, and source/asset integrity:
 
 ```bash
-node tests/run-tests.js
+npm run check
 ```
+
+GitHub Actions runs these checks and a Chromium smoke test on every pull request
+and every push to `main`.
+
+## Moving to another machine
+
+Research data is stored in the browser, not in this Git repository. Before
+retiring a machine, use **Settings → Export Workspace** and copy the resulting
+JSON backup separately. On the new machine:
+
+```bash
+git clone https://github.com/akougkas/ResearchFlow.git
+cd ResearchFlow
+npm ci
+npm run check
+python3 -m http.server 8000
+```
+
+Open `http://localhost:8000`, then import the workspace JSON from Settings.
 
 ---
 
 **Built with ❤️ for researchers**  
 *Making scientific research management smarter, one protocol at a time.*
-
 

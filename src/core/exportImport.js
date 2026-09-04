@@ -117,31 +117,11 @@ export class ExportImportEngine {
                 throw new Error('Invalid ResearchFlow backup format: missing tasks array.');
             }
 
-            const validTasks = data.tasks.filter(t => t.id && t.text);
-
-            if (!merge) {
-                // Clear existing tasks safely
-                const current = taskStore.getAll();
-                current.forEach(t => taskStore.delete(t.id));
+            if (data.tasks.some(task => !task || !task.id || !task.text)) {
+                throw new Error('Invalid ResearchFlow backup format: every task needs an ID and text.');
             }
 
-            // Create/update imported tasks
-            let importedCount = 0;
-            validTasks.forEach(t => {
-                taskStore.create({
-                    id: t.id,
-                    text: t.text,
-                    category: t.category || 'data',
-                    priority: t.priority || 'normal',
-                    completed: Boolean(t.completed),
-                    dueDate: t.dueDate || null,
-                    notes: t.notes || '',
-                    dependencies: Array.isArray(t.dependencies) ? t.dependencies : [],
-                    projectId: t.projectId || null,
-                    tags: Array.isArray(t.tags) ? t.tags : []
-                });
-                importedCount++;
-            });
+            const importedCount = taskStore.importTasks(data.tasks, { merge });
 
             return { success: true, count: importedCount };
         } catch (err) {
