@@ -1371,3 +1371,43 @@ button {
 .text-danger:hover {
   color: #7f2f20;
 }
+.nav-label,
+.sidebar-footer small {
+  color: #93a49c;
+}
+.breadcrumbs span,
+.search-trigger span,
+.search-trigger kbd,
+.sync-state {
+  color: #59645f;
+}
+.eyebrow {
+  color: #59665f;
+}
+.page-summary,
+.section-heading p,
+.board-column header p {
+  color: #56615c;
+}
+.section-heading > span {
+  color: #626d67;
+}
+.focus-index {
+  color: #6c7771;
+}
+.task-meta {
+  color: #65706a;
+}
+.priority-high {
+  color: #81550c;
+}
+.compact-task small,
+.compact-task > span:last-child {
+  color: #5e6963;
+}
+.progress-card > p:last-child {
+  color: #5c6761;
+}
+.research-note p {
+  color: #56665b;
+}

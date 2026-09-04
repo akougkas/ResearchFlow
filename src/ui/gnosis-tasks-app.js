@@ -119,10 +119,12 @@ export class GnosisTasksApp {
     }
     focusCard(t, i) {
         const [label, color] = META[t.category] || META.data;
-        return `<article class="focus-card" data-id="${t.id}"><button class="task-check" data-toggle="${t.id}">${icon('check', 15)}</button><span class="focus-index">0${i + 1}</span><div class="focus-copy"><div class="task-kicker"><i style="--dot:${color}"></i>${label}<span>·</span><b class="priority-${t.priority}">${t.priority}</b></div><h3>${safe(t.text)}</h3><p>${safe(t.notes || 'No research note added yet.')}</p><div class="task-meta"><span class="date-pill ${this.overdue(t) ? 'overdue' : ''}">${dateLabel(t.dueDate, true)}</span>${t.tags
+        return `<article class="focus-card" data-id="${t.id}"><button class="task-check" data-toggle="${t.id}" aria-label="Mark ${safe(t.text)} complete">${icon('check', 15)}</button><span class="focus-index">0${i + 1}</span><div class="focus-copy"><div class="task-kicker"><i style="--dot:${color}"></i>${label}<span>·</span><b class="priority-${t.priority}">${t.priority}</b></div><h3>${safe(t.text)}</h3><p>${safe(t.notes || 'No research note added yet.')}</p><div class="task-meta"><span class="date-pill ${this.overdue(t) ? 'overdue' : ''}">${dateLabel(t.dueDate, true)}</span>${t.tags
             .slice(0, 2)
             .map((x) => `<span>#${safe(x)}</span>`)
-            .join('')}</div></div><button class="open-task">${icon('arrow')}</button></article>`;
+            .join(
+                '',
+            )}</div></div><button class="open-task" aria-label="Open ${safe(t.text)}">${icon('arrow')}</button></article>`;
     }
     allTasks(tasks) {
         return `<div class="toolbar"><label class="search-field">${icon('search', 17)}<input id="task-search" value="${safe(this.query)}" placeholder="Search titles, notes, or tags"></label><div class="view-count">${tasks.length} items</div></div><section class="task-table"><div class="table-head"><span>Research item</span><span>Area</span><span>Status</span><span>Due</span><span></span></div>${tasks.map((t) => this.row(t)).join('') || this.empty('No matching work', 'Try a different search or research area.')}</section>`;

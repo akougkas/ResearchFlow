@@ -2,22 +2,34 @@ import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { chromium } from 'playwright';
+import AxeBuilder from '@axe-core/playwright';
 
 const output = path.resolve(process.env.ARTIFACT_DIR || 'test-results/screenshots');
 const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:8000/?demo=1';
 await mkdir(output, { recursive: true });
 
 const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage({
+const context = await browser.newContext({
     viewport: { width: 1440, height: 960 },
     deviceScaleFactor: 1,
 });
+const page = await context.newPage();
 const errors = [];
 page.on('pageerror', (error) => errors.push(error.message));
 
 try {
     await page.goto(baseUrl, { waitUntil: 'networkidle' });
     await page.getByRole('heading', { name: 'Move the work forward' }).waitFor();
+    const accessibility = await new AxeBuilder({ page }).analyze();
+    if (accessibility.violations.length) {
+        const details = accessibility.violations
+            .map(
+                (item) =>
+                    `${item.id}: ${item.nodes.map((node) => node.target.join(' ')).join(', ')}`,
+            )
+            .join('; ');
+        throw new Error(`Accessibility violations: ${details}`);
+    }
     await page.screenshot({ path: path.join(output, '01-focus.png'), fullPage: true });
 
     await page.getByRole('button', { name: 'All work' }).click();
@@ -67,13 +79,14 @@ try {
     await page.getByRole('button', { name: 'Delete' }).click();
     await editedTask.waitFor({ state: 'detached' });
 
-    const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    const mobileContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    const mobile = await mobileContext.newPage();
     mobile.on('pageerror', (error) => errors.push(error.message));
     await mobile.goto(baseUrl, { waitUntil: 'networkidle' });
     await mobile.locator('.mobile-menu').click();
     await mobile.locator('.sidebar').waitFor();
     await mobile.screenshot({ path: path.join(output, '07-mobile.png'), fullPage: true });
-    await mobile.close();
+    await mobileContext.close();
 
     if (errors.length) throw new Error(`Browser errors: ${errors.join('; ')}`);
     console.log('✅ Gnosis Tasks browser journey passed with zero page errors');
