@@ -3,18 +3,13 @@
  * covers the full application, including source modules and styles.
  */
 
-const CACHE_NAME = 'researchflow-v1.0.0-beta.1';
+const CACHE_NAME = 'gnosis-tasks-v0.2.0';
 const APP_ROOT = new URL('./', self.location.href);
 const SHELL = [
     './',
     './index.html',
     './public/manifest.json',
-    './styles/variables.css',
-    './styles/reset.css',
-    './styles/utils.css',
-    './styles/layout.css',
-    './styles/components.css',
-    './styles/responsive.css',
+    './styles/app.css',
     './src/ui/app.js'
 ].map(path => new URL(path, APP_ROOT).href);
 

@@ -1,28 +1,22 @@
 {
-  "name": "ResearchFlow - Research Task Manager",
-  "short_name": "ResearchFlow",
-  "description": "AI-powered todo app for scientific researchers",
+  "name": "Gnosis Tasks",
+  "short_name": "Tasks",
+  "description": "A calm workspace for ambitious research",
   "id": "../",
   "start_url": "../",
   "scope": "../",
   "display": "standalone",
-  "theme_color": "#0d1421",
-  "background_color": "#0d1421",
-  "orientation": "portrait-primary",
+  "theme_color": "#f4f1e9",
+  "background_color": "#f7f6f1",
+  "orientation": "any",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%230d1421' width='192' height='192'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='120' fill='%23f4a261'>🔬</text></svg>",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect rx='42' fill='%2316231f' width='192' height='192'/><rect x='47' y='103' width='22' height='42' rx='11' fill='%23c7ed71'/><rect x='85' y='47' width='22' height='98' rx='11' fill='%23c7ed71'/><rect x='123' y='76' width='22' height='69' rx='11' fill='%23c7ed71'/></svg>",
       "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "any"
     }
   ],
   "categories": ["productivity"],
-  "screenshots": [
-    {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><rect fill='%230d1421' width='540' height='720'/></svg>",
-      "sizes": "540x720",
-      "type": "image/svg+xml"
-    }
-  ]
+  "categories": ["productivity", "education"]
 }
